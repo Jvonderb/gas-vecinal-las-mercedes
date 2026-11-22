@@ -1,0 +1,3007 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gas Vecinal Las Mercedes - Sistema Oficial</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans pb-16">
+
+  <!-- Header Comunitario -->
+  <header class="bg-emerald-700 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-center md:text-left">
+        <div class="flex justify-center md:justify-start items-center space-x-2">
+          <i class="fa-solid fa-fire-flame-curved text-2xl text-amber-300"></i>
+          <h1 class="text-lg font-bold">Gas Vecinal Las Mercedes</h1>
+        </div>
+        <p class="text-xs text-emerald-200">Sector 1 Calle 2 Quebrada de Lele • Operativo Comunal (Supabase)</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="estado-sync-sb" class="bg-emerald-900/80 px-2.5 py-1 rounded-lg text-[11px] font-semibold">
+          ● Supabase listo
+        </span>
+        <div id="badge-rol" class="bg-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-user-shield text-amber-300"></i>
+          <span id="badge-rol-texto">Modo: ADMIN (Jorge)</span>
+        </div>
+        <button type="button" onclick="sincronizarTodoSupabase()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Sincronizar
+        </button>
+        <button type="button" onclick="abrirModalRol()" class="bg-slate-900 hover:bg-slate-800 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          <i class="fa-solid fa-key mr-1"></i> Cambiar Rol / Clave
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegación de las 6 Pestañas -->
+  <nav class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-2 py-2">
+      <button type="button" onclick="cambiarPestaña(1)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-700 text-white flex items-center gap-2 whitespace-nowrap shadow-sm">
+        <i class="fa-solid fa-users"></i> 1. Registro
+      </button>
+      <button type="button" onclick="cambiarPestaña(2)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-calendar-days"></i> 2. Campaña Anual & Estado
+      </button>
+      <button type="button" onclick="cambiarPestaña(3)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-file-invoice-dollar"></i> 3. Pagos & Propinas
+      </button>
+      <button type="button" onclick="cambiarPestaña(4)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-triangle-exclamation"></i> 4. Recepción Patio (Averías)
+      </button>
+      <button type="button" onclick="cambiarPestaña(5)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-truck-ramp-box"></i> 5. Entrega Patio
+      </button>
+      <button type="button" onclick="cambiarPestaña(6)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-chart-pie"></i> 6. Resumen y PDVSA
+      </button>
+    </div>
+  </nav>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl mx-auto px-4 mt-6">
+
+    <!-- PESTAÑA 1: REGISTRO -->
+    <section id="seccion-1" class="seccion-panel grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-user-plus text-emerald-600"></i> Registro Vecinos y Negocios
+          </h2>
+          <button type="button" onclick="limpiarFormulario()" class="text-xs text-emerald-700 hover:underline font-semibold">Limpiar</button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cédula (Solo numérica y > 0)</label>
+            <div class="flex gap-2">
+              <input type="number" id="reg-cedula" placeholder="Ej: 8686731" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+              <button type="button" onclick="buscarCedula()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 rounded-lg transition" title="Buscar cédula">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre y Apellido / Negocio</label>
+            <input type="text" id="reg-nombre" placeholder="Ej: María Pérez" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono (WhatsApp)</label>
+              <input type="text" id="reg-telefono" placeholder="04141234567" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tipo de Registro</label>
+              <select id="reg-tipo" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="Residente Sector">Residente Sector</option>
+                <option value="Comercio / Negocio">Comercio / Negocio</option>
+                <option value="Anexo / Alquilado">Anexo / Alquilado</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="aviso-existente" class="hidden p-2 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-circle-info"></i> Registro existente. Modifique las bombonas y pulse actualizar.
+          </div>
+
+          <hr class="my-2">
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold text-slate-700 uppercase">Bombonas del Vecino</label>
+              <button type="button" onclick="agregarFilaBombona()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-md font-semibold hover:bg-emerald-200 transition">
+                + Agregar otra
+              </button>
+            </div>
+            <div id="contenedor-bombonas" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+          </div>
+
+          <button type="button" onclick="guardarRegistro()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition text-sm mt-4">
+            Actualizar / Guardar Registro
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3 mb-4">
+          <h2 class="text-sm font-bold text-slate-700 uppercase">Listado General de Registrados</h2>
+          <input type="text" id="filtro-tabla" onkeyup="filtrarTabla()" placeholder="Buscar cédula o nombre..." class="p-2 border rounded-lg text-xs w-full md:w-64 focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+
+        <div class="overflow-x-auto flex-1 border rounded-lg">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                <th class="p-3">Cédula</th>
+                <th class="p-3">Nombre / Tipo</th>
+                <th class="p-3">Teléfono</th>
+                <th class="p-3">Bombonas & Seriales</th>
+                <th class="p-3 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-registros-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: CAMPAÑA & ESTADO -->
+    <section id="seccion-2" class="seccion-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <span class="bg-amber-100 text-amber-600 p-1.5 rounded-lg"><i class="fa-solid fa-bullhorn"></i></span>
+            Registrar / Editar Campaña de Gas
+          </h2>
+          <button type="button" onclick="prepararNuevaCampana()" class="text-xs text-slate-500 hover:underline font-semibold">Generar Sugerencia</button>
+        </div>
+
+        <input type="hidden" id="camp-id">
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre o Código del Operativo</label>
+            <input type="text" id="camp-nombre" placeholder="Ej: Operativo 1 - Noviembre 2026" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Fecha del Operativo</label>
+            <input type="date" id="camp-fecha" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+          </div>
+
+          <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
+            <h3 class="text-xs font-bold text-amber-800 uppercase mb-3">Precios Oficiales de la Jornada (PDVSA)</h3>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pequeña (10kg)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
+                  <input type="number" step="0.01" id="camp-precio-10" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Mediana (18kg)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
+                  <input type="number" step="0.01" id="camp-precio-18" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Grande (43kg)</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
+                  <input type="number" step="0.01" id="camp-precio-43" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" onclick="guardarCampana()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg shadow-sm transition text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-plus"></i> Guardar Campaña / Jornada
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase">Historial de Campañas Registradas</h2>
+          <span class="text-xs text-slate-400">Control de estado y precios</span>
+        </div>
+        <div id="contenedor-historial-campanas" class="space-y-4 max-h-[550px] overflow-y-auto pr-1"></div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: PAGOS & PROPINAS + VISOR COTEJO + EXPORTAR CSV -->
+    <section id="seccion-3" class="seccion-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-file-invoice-dollar text-emerald-600"></i> Registro de Pagos y Propinas
+          </h2>
+          <button type="button" onclick="limpiarFormularioPago()" class="text-xs text-emerald-700 hover:underline font-semibold">Limpiar</button>
+        </div>
+
+        <<form id="formPagos" onsubmit="enviarPagoVecinal(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+              <select id="pago-campana-select" onchange="refrescarPreciosCarritoYSeleccion(); renderizarTablaPagos();" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none" required></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cédula del Vecino</label>
+              <div class="flex gap-2">
+                <input type="number" id="pago-cedula" placeholder="Ej: 8686731" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" onkeydown="if (event.key === 'Enter') { event.preventDefault(); buscarVecinoParaPago(this.value); }" required>
+                <button type="button" onclick="buscarVecinoParaPago(document.getElementById('pago-cedula').value)" class="bg-slate-900 hover:bg-slate-800 text-white px-3 rounded-lg transition" title="Buscar vecino">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre y Apellido del Vecino</label>
+            <input type="text" id="pago-nombre" placeholder="Se llena automáticamente al buscar cédula" class="w-full p-2 border rounded-lg text-sm bg-slate-50 text-slate-600 outline-none" readonly required>
+          </div>
+
+          <div>
+            <label for="pago-bombona-select" class="block text-xs font-bold text-slate-600 uppercase mb-1">Bombona a Pagar / Reportar</label>
+            <div class="flex gap-2">
+              <select id="pago-bombona-select" onchange="mostrarPrecioBombonaSeleccionada()" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="">Primero busque una cédula...</option>
+              </select>
+              <button type="button" onclick="agregarBombonaAlCarrito()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg whitespace-nowrap transition">
+                + Adicionar
+              </button>
+            </div>
+            <div id="aviso-precio-bombona" class="text-[11px] text-emerald-700 font-semibold mt-1"></div>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 uppercase">Bombonas en este reporte</span>
+              <span class="text-[11px] text-slate-500">¿Adicionar otra de su registro?</span>
+            </div>
+            <div id="lista-bombonas-carrito" class="space-y-1.5">
+              <div class="text-xs text-slate-400 italic">Aún no has agregado bombonas al cobro.</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Monto Bombonas (Bs)</label>
+                <input type="text" id="pago-monto" value="0.00" readonly class="w-full p-2 border rounded-lg text-sm bg-slate-100 text-slate-700 font-semibold">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Aporte Logístico / Propina (Bs)</label>
+                <input type="text" inputmode="decimal" id="pago-propina" value="0.00" oninput="refrescarResumenPagoMixto()" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+              <span class="text-xs text-emerald-800 font-bold uppercase">TOTAL A PAGAR</span>
+              <span id="resumen-total-pagar" class="text-base font-extrabold text-emerald-700">Bs. 0.00</span>
+            </div>
+          </div>
+
+          <div id="panel-metodos-pago-mixto" class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+            <h3 class="text-xs font-bold text-slate-700 uppercase">Métodos de Pago y Comprobante</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Monto en Pago Móvil (Bs)</label>
+                <input type="text" inputmode="decimal" id="pago-monto-pm" value="0.00" oninput="sincronizarMontosMixtos('PM')" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Monto en Efectivo (Bs)</label>
+                <input type="text" inputmode="decimal" id="pago-monto-ef" value="0.00" oninput="sincronizarMontosMixtos('EF')" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">1º Comprobante de Pago (Capture -> Storage)</label>
+              <input type="file" id="pago-capture" accept="image/*" onchange="previsualizarCaptureComprimido()" class="w-full p-1.5 border rounded-lg text-xs bg-white">
+              <div id="info-compresion-capture" class="text-[10px] text-emerald-700 mt-1">Se comprime automáticamente antes de subir a Supabase Storage (captures-gas).</div>
+              <img id="preview-capture-img" class="hidden mt-2 max-h-36 rounded-lg border object-contain bg-white" alt="Vista previa capture">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">2º Banco Emisor</label>
+                <select id="pago-banco" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <option value="">Seleccione banco...</option>
+                  <option value="0102">0102 - Banco de Venezuela</option>
+                  <option value="0105">0105 - Mercantil</option>
+                  <option value="0134">0134 - Banesco</option>
+                  <option value="0108">0108 - Provincial</option>
+                  <option value="0191">0191 - BNC</option>
+                  <option value="0115">0115 - Exterior</option>
+                  <option value="OTRO">Otro Banco</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">3º Nº de Referencia</label>
+                <input type="tel" id="pago-referencia" placeholder="Ej: 8392" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-200 space-y-2">
+            <h3 class="text-xs font-bold text-amber-800 uppercase">¿El pago lo hizo un tercero / familiar? (Opcional)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nombre del Titular que pagó</label>
+                <input type="text" id="tercero-nombre" placeholder="Dejar en blanco si pagó el vecino" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cédula o Teléfono del Titular</label>
+                <input type="text" id="tercero-cedula" placeholder="Ej: V-15123456" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+       <div id="estado-confirmacion-pago" class="hidden text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2"></div>
+
+        <button type="submit" id="btn-submit-pago" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-sm transition">
+          Registrar Pago y Validar
+        </button>
+
+          
+        </form>
+      </div>
+
+      <!-- Listado de Pagos + Cotejo + Exportación CSV -->
+      <div class="lg:col-span-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-2 pb-2 border-b">
+          <div>
+            <h2 class="text-sm font-bold text-slate-700 uppercase">Pagos, Cotejo y Cierre CSV</h2>
+            <span id="contador-pagos-badge" class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-semibold">0 pagos</span>
+          </div>
+          <button type="button" onclick="exportarPagosCsv()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            <i class="fa-solid fa-file-csv mr-1"></i> Exportar CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto flex-1 border rounded-lg max-h-[380px]">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                <th class="p-2.5">Cédula / Vecino</th>
+                <th class="p-2.5">Ref / Banco</th>
+                <th class="p-2.5">Monto</th>
+                <th class="p-2.5">Cotejo / Capture</th>
+                <th class="p-2.5 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-pagos-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <!-- Visor rápido de Capture para cotejar contra banco receptor -->
+        <div id="visor-cotejo-capture" class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-700 uppercase"><i class="fa-solid fa-magnifying-glass-chart text-emerald-600 mr-1"></i> Visor de Cotejo Bancario</span>
+            <span id="visor-cotejo-meta" class="text-[11px] text-slate-500">Seleccione un pago para inspeccionar su capture</span>
+          </div>
+          <div id="visor-cotejo-contenido" class="text-xs text-slate-500 italic">
+            Sin capture seleccionado.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: RECEPCIÓN PATIO (BOMBONAS PAGADAS Y AVERÍAS) -->
+    <section id="seccion-4" class="seccion-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-warehouse text-amber-600"></i> 4. Recepción Patio (Averías)
+          </h2>
+          <button type="button" onclick="limpiarFormularioAveria()" class="text-xs text-amber-700 hover:underline font-semibold">Limpiar</button>
+        </div>
+
+        <form id="formAverias" onsubmit="registrarRecepcionPatio(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+            <select id="averia-campana-select" onchange="buscarVecinoParaAveria(document.getElementById('averia-cedula').value, true); renderizarTablaAverias();" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none" required></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cédula del Vecino</label>
+            <div class="flex gap-2">
+              <input type="number" id="averia-cedula" placeholder="Ej: 8686731" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none" onkeydown="if (event.key === 'Enter') { event.preventDefault(); buscarVecinoParaAveria(this.value); }">
+              <button type="button" onclick="buscarVecinoParaAveria(document.getElementById('averia-cedula').value)" class="bg-slate-900 hover:bg-slate-800 text-white px-3 rounded-lg transition" title="Buscar bombonas pagadas del vecino">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombre del Vecino</label>
+              <input type="text" id="averia-nombre" placeholder="Se llena al buscar cédula" class="w-full p-2 border rounded-lg text-sm bg-slate-50 focus:ring-2 focus:ring-amber-500 outline-none" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono (WhatsApp)</label>
+              <input type="text" id="averia-telefono" placeholder="04124519810" class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 uppercase">Bombonas Pagadas en Campaña</span>
+              <span id="contador-bombonas-pagadas-vecino" class="text-[11px] font-semibold text-emerald-700">0 bombonas</span>
+            </div>
+            <div id="lista-bombonas-pagadas-vecino" class="space-y-2">
+              <div class="text-xs text-slate-400 italic">Busque una cédula para ver las bombonas pagadas del vecino.</div>
+            </div>
+          </div>
+
+          <input type="hidden" id="averia-tamano" value="Gde (43kg)">
+          <input type="hidden" id="averia-serial" value="">
+
+          <div id="panel-detalle-averia-patio" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold text-amber-900 uppercase">
+                Avería y Devolución · <span id="averia-bombona-activa-label" class="font-mono"></span>
+              </span>
+              <label class="flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 cursor-pointer">
+                <input type="checkbox" id="averia-devuelto-ya" class="rounded text-emerald-600 focus:ring-emerald-500">
+                <span>Pago Devuelto al guardar</span>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Motivo / Avería</label>
+                <select id="averia-motivo" class="w-full p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                  <option value="Fuga en válvula / rosca">Fuga en válvula / rosca</option>
+                  <option value="Válvula dañada o trancada">Válvula dañada o trancada</option>
+                  <option value="Cilindro golpeado / abollado">Cilindro golpeado / abollado</option>
+                  <option value="Oxidación / mal estado">Oxidación / mal estado</option>
+                  <option value="Devolución / no procede llenado">Devolución / no procede llenado</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Entrega del Cilindro</label>
+                <select id="averia-estado" class="w-full p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                  <option value="Devuelto al Vecino" selected>Devuelto al Vecino</option>
+                  <option value="En Patio / Cuarentena">En Patio / Cuarentena</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Monto a Devolver / Descontar (Bs)</label>
+                <input type="number" step="0.01" id="averia-monto-devolver" value="0.00" class="w-full p-2 border rounded-lg text-sm bg-white font-bold text-red-700 focus:ring-2 focus:ring-amber-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Forma de Devolución</label>
+                <select id="averia-metodo-devolucion" class="w-full p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Pago Móvil">Pago Móvil</option>
+                  <option value="Descuento / Saldo a favor">Descuento / Saldo a favor</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 mb-1">Observación</label>
+              <input type="text" id="averia-observacion" placeholder="Ej: Se entrega cilindro al vecino y se descuenta/devuelve monto" class="w-full p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-amber-500 outline-none">
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-3 rounded-lg shadow-sm transition text-xs sm:text-sm">
+              Guardar Recepción / Avería
+            </button>
+            <button type="button" onclick="enviarWhatsAppRecibidasPlanta()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-lg shadow-sm transition text-xs sm:text-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <i class="fa-brands fa-whatsapp"></i> WS Recibidas
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-2 border-b">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="text-sm font-bold text-slate-700 uppercase">Control Patio: Recibidas y Averías</h2>
+            <span id="contador-averias-badge" class="text-xs bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-semibold">0</span>
+            <span id="total-devuelto-averias-badge" class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">Devuelto: Bs. 0.00</span>
+            <span id="total-pendiente-averias-badge" class="text-xs bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full font-bold">Pendiente: Bs. 0.00</span>
+          </div>
+          <input type="text" id="filtro-averias" onkeyup="renderizarTablaAverias()" placeholder="Buscar serial, cédula o motivo..." class="p-2 border rounded-lg text-xs w-full sm:w-56 focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+
+        <div class="overflow-x-auto flex-1 border rounded-lg max-h-[520px]">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                <th class="p-2.5">Serial / Tamaño</th>
+                <th class="p-2.5">Vecino / Teléfono</th>
+                <th class="p-2.5">Recepción / Avería</th>
+                <th class="p-2.5">Monto / Reembolso</th>
+                <th class="p-2.5 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-averias-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 5: ENTREGA PATIO -->
+    <section id="seccion-5" class="seccion-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit space-y-4">
+        <div class="flex justify-between items-center pb-2 border-b">
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-truck-ramp-box text-emerald-600"></i> 5. Entrega Patio
+          </h2>
+          <button type="button" onclick="renderizarTablaEntregas()" class="text-xs text-emerald-700 hover:underline font-semibold">
+            <i class="fa-solid fa-rotate mr-1"></i> Actualizar
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+          <select id="entrega-campana-select" onchange="renderizarTablaEntregas()" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none"></select>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+            <div class="text-[10px] font-bold text-slate-500 uppercase">Aptas Patio</div>
+            <div id="kpi-entrega-total" class="text-lg font-extrabold text-slate-800">0</div>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+            <div class="text-[10px] font-bold text-amber-700 uppercase">Pendientes</div>
+            <div id="kpi-entrega-pendientes" class="text-lg font-extrabold text-amber-700">0</div>
+          </div>
+          <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5">
+            <div class="text-[10px] font-bold text-emerald-700 uppercase">Entregadas</div>
+            <div id="kpi-entrega-entregadas" class="text-lg font-extrabold text-emerald-700">0</div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+          <label class="block text-xs font-bold text-slate-700 uppercase">Observación rápida de retiro (Opcional)</label>
+          <input type="text" id="entrega-nota-retiro" placeholder="Ej: Retira titular / 2do viaje planta" class="w-full p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <p class="text-[11px] text-slate-500 leading-snug">
+            Solo aparecen bombonas recibidas en patio <strong>sin avería</strong>. Entrega una a una y envía su comprobante por WhatsApp.
+          </p>
+        </div>
+
+        <div id="panel-ws-entrega-individual" class="bg-emerald-50/50 border border-emerald-200 rounded-xl p-3.5 space-y-2.5">
+          <div class="text-xs font-bold text-emerald-900 uppercase">
+            Comprobante Directo por WhatsApp
+          </div>
+          <p id="info-ws-ultimo-despacho" class="text-[11px] text-slate-600 leading-snug">
+            Al entregar una bombona, se preparará el comprobante con el teléfono registrado del vecino.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button type="button" onclick="enviarComprobanteEntregaWs('vecino')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-lg text-xs">
+              Enviar a Vecino
+            </button>
+            <button type="button" onclick="enviarComprobanteEntregaWs('respaldo')" class="flex-1 bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold py-2 px-3 rounded-lg text-xs">
+              Copia a Mi WS
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 space-y-2.5">
+          <h3 class="text-xs font-bold text-emerald-900 uppercase flex items-center gap-1.5">
+            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Aviso General a Vecinos
+          </h3>
+          <p class="text-[11px] text-emerald-800">
+            Notifica al grupo vecinal que llegaron bombonas de planta para que bajen a verificar y retirar en patio.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button type="button" onclick="enviarWhatsAppAvisoLlegada()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow-sm">
+              <i class="fa-brands fa-whatsapp"></i> Enviar Aviso WS
+            </button>
+            <button type="button" onclick="copiarAvisoLlegada()" class="bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold py-2 px-3 rounded-lg text-xs transition">
+              Copiar Texto
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4 pb-2 border-b">
+          <div>
+            <h2 class="text-sm font-bold text-slate-700 uppercase">Despacho Individual en Patio</h2>
+            <p class="text-[11px] text-slate-500">Incluye bombonas con serial y S/N · Control parcial por vecino</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <select id="filtro-estado-entrega" onchange="renderizarTablaEntregas()" class="p-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+              <option value="TODOS">Todos los estatus</option>
+              <option value="PENDIENTE" selected>Solo Pendientes</option>
+              <option value="ENTREGADA">Solo Entregadas</option>
+            </select>
+            <input type="text" id="filtro-entregas" onkeyup="renderizarTablaEntregas()" placeholder="Buscar cédula, vecino o serial..." class="p-2 border rounded-lg text-xs flex-1 md:w-56 focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto flex-1 border rounded-lg max-h-[540px]">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                <th class="p-2.5">Cilindro / Tamaño</th>
+                <th class="p-2.5">Vecino / Progreso</th>
+                <th class="p-2.5">Estatus Entrega</th>
+                <th class="p-2.5 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-entregas-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 6: RESUMEN Y PDVSA -->
+    <section id="seccion-6" class="seccion-panel hidden space-y-6">
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-emerald-600"></i> 6. Resumen Operativo y Cuadre PDVSA
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Consolidado de recaudación, cilindros por tamaño, averías y entregas en patio</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <select id="resumen-campana-select" onchange="renderizarResumenPdvsa()" class="p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none flex-1 md:w-64"></select>
+          <button type="button" onclick="renderizarResumenPdvsa()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-semibold transition">
+            <i class="fa-solid fa-rotate mr-1"></i> Actualizar
+          </button>
+          <button type="button" onclick="exportarPagosCsv()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+            <i class="fa-solid fa-file-csv mr-1"></i> CSV Pagos
+          </button>
+          <button type="button" onclick="copiarResumenPdvsa()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+            <i class="fa-regular fa-copy mr-1"></i> Copiar Resumen
+          </button>
+          <button type="button" onclick="enviarResumenPdvsaWhatsApp()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+            <i class="fa-brands fa-whatsapp mr-1"></i> Enviar WS
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-[11px] font-bold text-slate-500 uppercase">Total Recaudado</div>
+          <div id="res-kpi-recaudado" class="text-xl font-extrabold text-slate-800 mt-1">Bs. 0.00</div>
+          <div id="res-kpi-pm-ef" class="text-[11px] text-slate-500 mt-1">PM: 0.00 · Ef: 0.00</div>
+        </div>
+        <div class="bg-emerald-50/70 p-4 rounded-xl shadow-sm border border-emerald-200">
+          <div class="text-[11px] font-bold text-emerald-800 uppercase">Neto PDVSA (Bombonas)</div>
+          <div id="res-kpi-pdvsa" class="text-xl font-extrabold text-emerald-700 mt-1">Bs. 0.00</div>
+          <div class="text-[11px] text-emerald-700 mt-1">Sin propina · Menos devuelto</div>
+        </div>
+        <div class="bg-amber-50/70 p-4 rounded-xl shadow-sm border border-amber-200">
+          <div class="text-[11px] font-bold text-amber-800 uppercase">Propinas / Logística</div>
+          <div id="res-kpi-propinas" class="text-xl font-extrabold text-amber-700 mt-1">Bs. 0.00</div>
+          <div class="text-[11px] text-amber-700 mt-1">Aporte operativo vecinal</div>
+        </div>
+        <div class="bg-red-50/60 p-4 rounded-xl shadow-sm border border-red-200">
+          <div class="text-[11px] font-bold text-red-800 uppercase">Averías / Devoluciones</div>
+          <div id="res-kpi-averias-monto" class="text-xl font-extrabold text-red-700 mt-1">Bs. 0.00</div>
+          <div id="res-kpi-averias-detalle" class="text-[11px] text-red-700 mt-1">Dev: 0.00 · Pend: 0.00</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-[11px] font-bold text-slate-500 uppercase">Avance en Patio</div>
+          <div id="res-kpi-patio" class="text-xl font-extrabold text-slate-800 mt-1">0 / 0</div>
+          <div id="res-kpi-patio-sub" class="text-[11px] text-slate-500 mt-1">Entregadas / Aptas patio</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <h3 class="text-xs font-bold text-slate-700 uppercase mb-3 pb-2 border-b">Desglose de Bombonas por Tamaño</h3>
+          <div class="overflow-x-auto border rounded-lg">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                  <th class="p-2.5">Tamaño</th>
+                  <th class="p-2.5 text-center">Pagadas</th>
+                  <th class="p-2.5 text-center">Recibidas Patio</th>
+                  <th class="p-2.5 text-center">Averías</th>
+                  <th class="p-2.5 text-center">Entregadas</th>
+                  <th class="p-2.5 text-right">Subtotal (Bs.)</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-resumen-tamanos-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
+          <h3 class="text-xs font-bold text-slate-700 uppercase pb-2 border-b">Detalle de Conciliación y Caja</h3>
+          <div id="detalle-cuadre-pdvsa" class="space-y-2 text-xs text-slate-700"></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2 border-b">
+          <div>
+            <h3 class="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-building-columns text-emerald-600"></i> Detalle de Recaudación: Efectivo y Pago Móvil por Banco Emisor
+            </h3>
+            <p class="text-[11px] text-slate-500">Agrupación de cobros de la campaña seleccionada por método de pago y banco emisor</p>
+          </div>
+          <span id="res-badge-metodos-total" class="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold">
+            Total Métodos: Bs. 0.00
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="text-[11px] font-bold text-slate-500 uppercase">Total Monto en Efectivo</div>
+              <div id="res-detalle-efectivo-monto" class="text-2xl font-extrabold text-slate-800 mt-1">Bs. 0.00</div>
+              <div id="res-detalle-efectivo-ops" class="text-xs text-slate-500 mt-1">0 operación(es) con efectivo</div>
+            </div>
+            <div class="text-[11px] text-slate-600 bg-white border border-slate-200 rounded-lg p-2.5">
+              Incluye pagos 100% en efectivo y porción en efectivo de pagos mixtos.
+            </div>
+          </div>
+
+          <div class="lg:col-span-8">
+            <div class="overflow-x-auto border rounded-lg">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 uppercase border-b">
+                    <th class="p-2.5">Banco Emisor</th>
+                    <th class="p-2.5 text-center">Operaciones</th>
+                    <th class="p-2.5 text-right">Monto Pago Móvil (Bs.)</th>
+                    <th class="p-2.5 text-right">% del PM</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-resumen-bancos-body" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+            <div class="bg-white border border-slate-200 rounded-lg p-3">
+              <div class="text-[10px] font-bold text-slate-500 uppercase">Total Efectivo</div>
+              <div id="res-cuadre-efectivo" class="text-sm font-extrabold text-slate-800 mt-1">Bs. 0.00</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-lg p-3">
+              <div class="text-[10px] font-bold text-slate-500 uppercase">Total Bancos (PM)</div>
+              <div id="res-cuadre-bancos" class="text-sm font-extrabold text-emerald-700 mt-1">Bs. 0.00</div>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <div class="text-[10px] font-bold text-amber-800 uppercase">Total Propinas</div>
+              <div id="res-cuadre-propinas" class="text-sm font-extrabold text-amber-800 mt-1">Bs. 0.00</div>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+              <div class="text-[10px] font-bold text-red-800 uppercase">Averías Devueltas</div>
+              <div id="res-cuadre-devueltas" class="text-sm font-extrabold text-red-700 mt-1">- Bs. 0.00</div>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-300 rounded-lg p-3">
+              <div class="text-[10px] font-bold text-emerald-900 uppercase">A Pagar / Rendir PDVSA</div>
+              <div id="res-cuadre-neto-pdvsa" class="text-base font-extrabold text-emerald-800 mt-0.5">Bs. 0.00</div>
+            </div>
+          </div>
+          <div id="res-cuadre-formula-texto" class="text-[11px] text-slate-600">
+            Cuadre: Efectivo + Bancos − Propinas − Averías devueltas = Neto a pagar a PDVSA.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE CAMBIO DE ROL / CLAVE -->
+  <div id="modalRol" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-96 shadow-2xl">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">Acceso por Rol / Clave</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Usuario o Cédula</label>
+          <input type="text" id="inputUsuarioLogin" class="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Ej. 8686731 o admin">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Clave de Acceso</label>
+          <input type="password" id="inputClaveLogin" class="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="••••">
+        </div>
+        <div id="errorLogin" class="text-red-500 text-sm hidden"></div>
+        <div class="flex justify-end space-x-3 mt-6">
+          <button type="button" onclick="cerrarModalRol()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-xs font-semibold">Cancelar</button>
+          <button type="button" onclick="ejecutarLogin()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs font-semibold">Ingresar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://xpnpxmyjmmcdebglkatz.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_xipnuf5SS19IcG30rh7RCg_B2fQ509g";
+    const BUCKET_CAPTURES = "captures-gas";
+
+    const sbClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    let registrosGas = JSON.parse(localStorage.getItem('registrosGas')) || [];
+    let campanasGas = JSON.parse(localStorage.getItem('campanasGas')) || [];
+    let pagosRegistradosCampana = JSON.parse(localStorage.getItem('pagosRegistradosCampana')) || [];
+    let bombonasSeleccionadasPago = [];
+    let averiasPatioGas = JSON.parse(localStorage.getItem('averiasPatioGas')) || [];
+    let bombonasPagadasVecinoPatio = [];
+    let entregasPatioGas = JSON.parse(localStorage.getItem('entregasPatioGas')) || [];
+    let captureComprimidoBlob = null;
+
+    function setEstadoSync(texto, ok = true) {
+      const el = document.getElementById('estado-sync-sb');
+      if (!el) return;
+      el.textContent = texto;
+      el.className = ok
+        ? "bg-emerald-900/80 text-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold"
+        : "bg-amber-700 text-amber-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold";
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!localStorage.getItem("gas_rol")) {
+        localStorage.setItem("gas_rol", "ADMIN");
+        localStorage.setItem("gas_usuario", "Jorge");
+      }
+      aplicarPermisosRol();
+      agregarFilaBombona('Gde (43kg)', '');
+      prepararNuevaCampana();
+      renderizarTodoLocal();
+      await sincronizarTodoSupabase();
+    });
+
+    function renderizarTodoLocal() {
+      renderizarTabla();
+      renderizarCampanas();
+      actualizarSelectCampanasPago();
+      actualizarSelectCampanasAverias();
+      actualizarSelectCampanasEntregas();
+      actualizarSelectCampanasResumen();
+      renderizarTablaPagos();
+      renderizarTablaAverias();
+      renderizarTablaEntregas();
+      renderizarResumenPdvsa();
+      refrescarResumenPagoMixto();
+    }
+
+    async function sincronizarTodoSupabase() {
+      if (!sbClient) return;
+      setEstadoSync("↻ Sincronizando...", true);
+      try {
+        await Promise.all([
+          cargarVecinosDesdeSupabase(),
+          cargarCampanasDesdeSupabase(),
+          cargarPagosDesdeSupabase(),
+          cargarAveriasDesdeSupabase(),
+          cargarEntregasDesdeSupabase()
+        ]);
+        renderizarTodoLocal();
+        setEstadoSync("● Sincronizado Supabase", true);
+      } catch (e) {
+        console.warn("Error sincronizando con Supabase:", e);
+        setEstadoSync("! Modo local / reintentar", false);
+      }
+    }
+
+    // --- CARGA DESDE SUPABASE ---
+    async function cargarVecinosDesdeSupabase() {
+  const [resVecinos, resCilindros] = await Promise.all([
+    sbClient.from('vecinos_gas').select('*').order('nombre_apellido', { ascending: true }),
+    sbClient.from('cilindros_vecinos_gas').select('*').order('created_at', { ascending: true })
+  ]);
+
+  if (resVecinos.error || !Array.isArray(resVecinos.data)) return;
+
+  const cilindrosPorCedula = new Map();
+  if (!resCilindros.error && Array.isArray(resCilindros.data)) {
+    resCilindros.data.forEach(c => {
+      const ced = String(c.cedula || '').trim();
+      if (!ced) return;
+      if (!cilindrosPorCedula.has(ced)) cilindrosPorCedula.set(ced, []);
+      cilindrosPorCedula.get(ced).push({
+        tamano: c.bombona_tamano || 'Peq (10kg)',
+        serial: c.numero_bombona || 'S/N'
+      });
+    });
+  }
+
+  const lista = resVecinos.data
+    .map(row => {
+      const ced = String(row.cedula || '').trim();
+      if (!ced) return null;
+      const bombonasDetalle = cilindrosPorCedula.get(ced) || [
+        {
+          tamano: row.bombona_tamano || 'Peq (10kg)',
+          serial: row.numero_bombona || 'S/N'
+        }
+      ];
+      return {
+        cedula: ced,
+        nombre: row.nombre_apellido || '',
+        telefono: row.telefono || '',
+        tipo: row.tipo_registro || 'Residente Sector',
+        bombonasDetalle,
+        bombonasTexto: bombonasDetalle.map(b => `${b.tamano} [${b.serial}]`).join(', ')
+      };
+    })
+    .filter(Boolean);
+
+  if (lista.length > 0) {
+    registrosGas = lista;
+    localStorage.setItem('registrosGas', JSON.stringify(registrosGas));
+    renderizarTabla();
+  }
+}
+
+    async function cargarCampanasDesdeSupabase() {
+      const { data, error } = await sbClient.from('campanas_gas').select('*').order('fecha', { ascending: false });
+      if (error || !Array.isArray(data) || data.length === 0) return;
+      campanasGas = data.map(c => ({
+        id: c.id_campana,
+        nombre: c.nombre,
+        fecha: c.fecha,
+        precio10: Number(c.precio_10kg) || 0,
+        precio18: Number(c.precio_18kg) || 0,
+        precio43: Number(c.precio_43kg) || 0,
+        estado: c.estado || 'ACTIVA',
+        montoGeneral: Number(c.monto_general) || 0,
+        totalPagoMovil: Number(c.total_pago_movil) || 0,
+        totalEfectivo: Number(c.total_efectivo) || 0,
+        netoPdvsa: Number(c.neto_pdvsa) || 0,
+        totalPropinas: Number(c.total_propinas) || 0
+      }));
+      localStorage.setItem('campanasGas', JSON.stringify(campanasGas));
+    }
+
+    async function cargarPagosDesdeSupabase() {
+      const { data, error } = await sbClient.from('pagos_gas').select('*').order('fecha_registro', { ascending: false });
+      if (error || !Array.isArray(data)) return;
+      const porLote = new Map();
+      data.forEach(row => {
+        const lote = row.lote_pago || row.id;
+        if (!porLote.has(lote)) {
+          porLote.set(lote, {
+            id: lote,
+            campanaId: row.campana_id,
+            cedula: row.cedula,
+            nombre: row.nombre_apellido,
+            telefono: row.telefono || '',
+            bombonas: [],
+            subtotalBombonas: 0,
+            propina: Number(row.propina) || 0,
+            totalPagar: Number(row.total_pagar) || 0,
+            monto: Number(row.total_pagar) || 0,
+            pm: Number(row.monto_pm) || 0,
+            ef: Number(row.monto_ef) || 0,
+            banco: row.banco_codigo || '',
+            referencia: row.referencia || '',
+            capturePath: row.capture_path || '',
+            captureUrl: row.capture_url || '',
+            terceroNombre: row.tercero_nombre || '',
+            terceroCedula: row.tercero_cedula || '',
+            cotejadoBanco: Boolean(row.cotejado_banco),
+            cotejadoPor: row.cotejado_por || '',
+            registradoPor: row.registrado_por || '',
+            fechaRegistro: row.fecha_registro
+          });
+        }
+        const item = porLote.get(lote);
+        const precioB = Number(row.precio) || 0;
+        item.bombonas.push({
+          numero: row.numero_bombona || 'S/N',
+          tamano: row.bombona_tamano || '',
+          precio: precioB
+        });
+        item.subtotalBombonas += precioB;
+      });
+      pagosRegistradosCampana = Array.from(porLote.values());
+      localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
+    }
+
+    async function cargarAveriasDesdeSupabase() {
+      const { data, error } = await sbClient.from('averias_patio_gas').select('*').order('fecha', { ascending: false });
+      if (error || !Array.isArray(data)) return;
+        averiasPatioGas = data.map(a => ({
+        id: a.id_averia,
+        campanaId: a.campana_id,
+        cedula: a.cedula || '',
+        nombre: a.nombre || '',
+        numeroBombona: a.numero_bombona || 'S/N',
+        telefono: a.telefono || '',
+        tamano: a.tamano || '',
+        recibidaEnPatio: a.recibida_en_patio !== false,
+        esAveria: Boolean(a.es_averia),
+        motivo: a.motivo || '',
+        estadoPatio: a.estado_patio || '',
+        observacion: a.observacion || '',
+        montoDevuelto: Number(a.monto_devuelto) || 0,
+        metodoDevolucion: a.metodo_devolucion || '',
+        estadoReembolso: a.estado_reembolso || 'NO_APLICA',
+        conciliadoPor: a.conciliado_por || '',
+        registradoPor: a.registrado_por || '',
+        fecha: a.fecha ? new Date(a.fecha).toLocaleString('es-VE') : ''
+      }));
+   const vistas = new Set();
+   averiasPatioGas = averiasPatioGas.filter((item) => {
+    const serial = String(item.numeroBombona || '').trim().toUpperCase();
+    if (!serial || serial === 'S/N') return true;
+    const clave = `${String(item.campanaId || '').trim()}|${String(item.cedula || '').trim()}|${serial}`;
+    if (vistas.has(clave)) return false;
+    vistas.add(clave);
+    return true;
+  });
+
+      localStorage.setItem('averiasPatioGas', JSON.stringify(averiasPatioGas));
+    }
+
+    async function cargarEntregasDesdeSupabase() {
+      const { data, error } = await sbClient.from('entregas_patio_gas').select('*').order('fecha_entrega', { ascending: false });
+      if (error || !Array.isArray(data)) return;
+      entregasPatioGas = data.map(e => ({
+        id: e.id_entrega,
+        idRecepcion: e.id_recepcion,
+        campanaId: e.campana_id,
+        cedula: e.cedula || '',
+        nombre: e.vecino || '',
+        telefono: e.telefono || '',
+        numeroBombona: e.serial_bombona || 'S/N',
+        tamano: e.tamano || '',
+        estadoEntrega: e.estatus || 'ENTREGADA',
+        notaRetiro: e.nota_retiro || '',
+        entregadoPor: e.entregado_por || '',
+        fechaEntrega: e.fecha_entrega ? new Date(e.fecha_entrega).toLocaleString('es-VE') : ''
+      }));
+      localStorage.setItem('entregasPatioGas', JSON.stringify(entregasPatioGas));
+    }
+
+    // --- COMPRESIÓN PREVIA DE CAPTURE Y SUBIDA A STORAGE ---
+    function comprimirImagenFile(file, maxAncho = 1100, calidad = 0.72) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const escala = img.width > maxAncho ? maxAncho / img.width : 1;
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * escala);
+            canvas.height = Math.round(img.height * escala);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob((blob) => {
+              if (!blob) return reject(new Error("No se pudo comprimir la imagen."));
+              resolve(blob);
+            }, 'image/jpeg', calidad);
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function previsualizarCaptureComprimido() {
+      const input = document.getElementById('pago-capture');
+      const infoEl = document.getElementById('info-compresion-capture');
+      const imgEl = document.getElementById('preview-capture-img');
+      captureComprimidoBlob = null;
+
+      if (!input || !input.files || !input.files[0]) {
+        if (imgEl) imgEl.classList.add('hidden');
+        if (infoEl) infoEl.textContent = "Se comprime automáticamente antes de subir a Supabase Storage (captures-gas).";
+        return;
+      }
+
+      const file = input.files[0];
+      try {
+        const comprimido = await comprimirImagenFile(file, 1100, 0.72);
+        captureComprimidoBlob = comprimido;
+        const kbOriginal = Math.round(file.size / 1024);
+        const kbFinal = Math.round(comprimido.size / 1024);
+        if (infoEl) {
+          infoEl.textContent = `Comprimido: ${kbOriginal} KB → ${kbFinal} KB (listo para Storage)`;
+        }
+        if (imgEl) {
+          imgEl.src = URL.createObjectURL(comprimido);
+          imgEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        if (infoEl) infoEl.textContent = "No se pudo previsualizar; se intentará subir el archivo.";
+      }
+    }
+
+    async function subirCaptureSupabase(campanaId, cedula, referencia, archivoOriginal) {
+      if (!sbClient) return { path: '', url: '' };
+      let blob = captureComprimidoBlob;
+      if (!blob && archivoOriginal) {
+        try {
+          blob = await comprimirImagenFile(archivoOriginal, 1100, 0.72);
+        } catch (_) {
+          blob = archivoOriginal;
+        }
+      }
+      if (!blob) return { path: '', url: '' };
+
+      const refLimpia = String(referencia || 'pago').replace(/[^a-zA-Z0-9_-]/g, '');
+      const ruta = `${campanaId || 'general'}/${cedula || 'sin_ci'}_${refLimpia}_${Date.now()}.jpg`;
+
+      const { error } = await sbClient.storage
+        .from(BUCKET_CAPTURES)
+        .upload(ruta, blob, { contentType: 'image/jpeg', upsert: false });
+
+      if (error) {
+        throw new Error("Error subiendo capture a Storage: " + error.message);
+      }
+
+      const { data: pub } = sbClient.storage.from(BUCKET_CAPTURES).getPublicUrl(ruta);
+      return { path: ruta, url: pub?.publicUrl || '' };
+    }
+
+    // --- NAVEGACIÓN Y ROL ---
+    function cambiarPestaña(num) {
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      if (rol === "USUARIO" && ![1, 3, 4].includes(num)) {
+        alert("Acceso restringido. Su rol actual solo permite ver las pestañas 1, 3 y 4.");
+        return;
+      }
+      if (rol === "OPERADOR" && ![1, 3, 4, 5].includes(num)) {
+        alert("Acceso restringido para operarios en esta pestaña.");
+        return;
+      }
+      document.querySelectorAll('.seccion-panel').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = "tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap";
+      });
+      document.getElementById(`seccion-${num}`).classList.remove('hidden');
+      const botonesTab = document.querySelectorAll('.tab-btn');
+      if (botonesTab[num - 1]) {
+        botonesTab[num - 1].className = "tab-btn px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-700 text-white flex items-center gap-2 whitespace-nowrap shadow-sm";
+      }
+      if (num === 6) renderizarResumenPdvsa();
+      if (num === 5) renderizarTablaEntregas();
+      if (num === 4) renderizarTablaAverias();
+      if (num === 3) renderizarTablaPagos();
+    }
+
+    function abrirModalRol() {
+      document.getElementById("modalRol").classList.remove("hidden");
+      document.getElementById("errorLogin").classList.add("hidden");
+      document.getElementById("inputUsuarioLogin").value = "";
+      document.getElementById("inputClaveLogin").value = "";
+    }
+
+    function cerrarModalRol() {
+      document.getElementById("modalRol").classList.add("hidden");
+    }
+
+    async function ejecutarLogin() {
+      const usuario = document.getElementById("inputUsuarioLogin").value.trim();
+      const clave = document.getElementById("inputClaveLogin").value.trim();
+      const errorDiv = document.getElementById("errorLogin");
+      if (!usuario || !clave) {
+        errorDiv.textContent = "Por favor ingrese usuario y clave.";
+        errorDiv.classList.remove("hidden");
+        return;
+      }
+
+      if (sbClient) {
+        const { data } = await sbClient
+          .from('usuarios_gas')
+          .select('*')
+          .eq('usuario_cedula', usuario)
+          .eq('clave_acceso', clave)
+          .eq('activo', true)
+          .maybeSingle();
+        if (data) {
+          localStorage.setItem("gas_rol", String(data.rol || "OPERADOR").toUpperCase());
+          localStorage.setItem("gas_usuario", data.nombre || usuario);
+          cerrarModalRol();
+          aplicarPermisosRol();
+          renderizarCampanas();
+          alert(`¡Bienvenido, ${data.nombre}! Rol: ${data.rol}`);
+          return;
+        }
+      }
+
+      if (usuario === "8686731" && clave === "1091") {
+        localStorage.setItem("gas_rol", "ADMIN");
+        localStorage.setItem("gas_usuario", "Jorge");
+        cerrarModalRol();
+        aplicarPermisosRol();
+        renderizarCampanas();
+        alert("¡Bienvenido, Jorge! Rol asignado: ADMIN");
+        return;
+      }
+
+      errorDiv.textContent = "Usuario o clave incorrectos.";
+      errorDiv.classList.remove("hidden");
+    }
+
+    function aplicarPermisosRol() {
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      const nombre = localStorage.getItem("gas_usuario") || "Jorge";
+      const badgeTexto = document.getElementById("badge-rol-texto");
+      if (badgeTexto) badgeTexto.textContent = `Modo: ${rol} (${nombre})`;
+
+      const tabs = document.querySelectorAll(".tab-btn");
+      tabs.forEach((tab, index) => {
+        const numTab = index + 1;
+        if (rol === "ADMIN") {
+          tab.style.display = "flex";
+        } else if (rol === "OPERADOR") {
+          tab.style.display = [1, 3, 4, 5].includes(numTab) ? "flex" : "none";
+        } else {
+          tab.style.display = [1, 3, 4].includes(numTab) ? "flex" : "none";
+        }
+      });
+    }
+
+    // --- PESTAÑA 1: REGISTRO ---
+    function agregarFilaBombona(tamano = 'Gde (43kg)', serial = '') {
+      const contenedor = document.getElementById('contenedor-bombonas');
+      if (!contenedor) return;
+      const divFila = document.createElement('div');
+      divFila.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-lg border mb-2';
+      divFila.innerHTML = `
+        <select class="bombona-tamano p-1.5 border rounded text-xs bg-white">
+          <option value="Peq (10kg)" ${tamano === 'Peq (10kg)' ? 'selected' : ''}>Peq (10kg)</option>
+          <option value="Med (18kg)" ${tamano === 'Med (18kg)' ? 'selected' : ''}>Med (18kg)</option>
+          <option value="Gde (43kg)" ${tamano === 'Gde (43kg)' ? 'selected' : ''}>Gde (43kg)</option>
+        </select>
+        <input type="text" placeholder="Nº Serial o S/N" class="bombona-serial p-1.5 border rounded text-xs flex-1" value="${serial}">
+        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 px-2 font-bold" title="Eliminar fila">🗑</button>
+      `;
+      contenedor.appendChild(divFila);
+    }
+
+    function buscarCedula() {
+      const cedulaBuscada = document.getElementById('reg-cedula').value.trim();
+      if (!cedulaBuscada) {
+        alert("Por favor ingrese un número de cédula para buscar.");
+        return;
+      }
+      const encontrado = registrosGas.find(r => String(r.cedula).trim() === cedulaBuscada);
+      const contenedor = document.getElementById('contenedor-bombonas');
+      contenedor.innerHTML = '';
+
+      if (encontrado) {
+        document.getElementById('reg-nombre').value = encontrado.nombre;
+        document.getElementById('reg-telefono').value = encontrado.telefono;
+        document.getElementById('reg-tipo').value = encontrado.tipo || 'Residente Sector';
+        document.getElementById('aviso-existente').classList.remove('hidden');
+        if (encontrado.bombonasDetalle && encontrado.bombonasDetalle.length > 0) {
+          encontrado.bombonasDetalle.forEach(b => agregarFilaBombona(b.tamano, b.serial));
+        } else {
+          agregarFilaBombona();
+        }
+      } else {
+        document.getElementById('reg-nombre').value = '';
+        document.getElementById('reg-telefono').value = '';
+        document.getElementById('aviso-existente').classList.add('hidden');
+        agregarFilaBombona();
+      }
+    }
+
+    async function guardarRegistro() {
+      const cedula = document.getElementById('reg-cedula').value.trim();
+      const nombre = document.getElementById('reg-nombre').value.trim();
+      const telefono = document.getElementById('reg-telefono').value.trim();
+      const tipo = document.getElementById('reg-tipo').value;
+
+      if (!cedula || !nombre) {
+        alert("La cédula y el nombre son obligatorios.");
+        return;
+      }
+
+      const filas = document.querySelectorAll('#contenedor-bombonas > div');
+      if (filas.length === 0) {
+        alert("Debe agregar al menos una bombona.");
+        return;
+      }
+
+      const bombonasResumen = [];
+      const bombonasDetalle = [];
+      filas.forEach(fila => {
+        const tamano = fila.querySelector('.bombona-tamano').value;
+        const serial = fila.querySelector('.bombona-serial').value.trim() || 'S/N';
+        bombonasResumen.push(`${tamano} [${serial}]`);
+        bombonasDetalle.push({ tamano, serial });
+      });
+
+      const datosRegistro = {
+        cedula,
+        nombre,
+        telefono,
+        tipo,
+        bombonasTexto: bombonasResumen.join(', '),
+        bombonasDetalle
+      };
+
+      const index = registrosGas.findIndex(r => String(r.cedula).trim() === cedula);
+      if (index >= 0) registrosGas[index] = datosRegistro;
+      else registrosGas.push(datosRegistro);
+
+      localStorage.setItem('registrosGas', JSON.stringify(registrosGas));
+      renderizarTabla();
+
+      if (sbClient) {
+    try {
+      const { error: errVecino } = await sbClient
+        .from('vecinos_gas')
+        .upsert(
+          {
+            cedula,
+            nombre_apellido: nombre,
+            telefono,
+            tipo_registro: tipo,
+            actualizado_por: localStorage.getItem('gas_usuario') || 'Jorge'
+          },
+          { onConflict: 'cedula' }
+        );
+      if (errVecino) throw errVecino;
+
+      const { error: errDelCil } = await sbClient
+        .from('cilindros_vecinos_gas')
+        .delete()
+        .eq('cedula', cedula);
+      if (errDelCil) throw errDelCil;
+
+      const filasCilindros = bombonasDetalle.map(b => ({
+        cedula,
+        numero_bombona: String(b.serial || 'S/N').trim().toUpperCase() || 'S/N',
+        bombona_tamano: b.tamano || 'Peq (10kg)'
+      }));
+
+      if (filasCilindros.length > 0) {
+        const { error: errInsCil } = await sbClient
+          .from('cilindros_vecinos_gas')
+          .insert(filasCilindros);
+        if (errInsCil) throw errInsCil;
+      }
+
+      setEstadoSync("• Sincronizado Supabase", true);
+    } catch (e) {
+      console.error("Error guardando vecino/cilindros en Supabase:", e);
+      setEstadoSync("! Guardado local (revisar SB)", false);
+    }
+  }
+
+      limpiarFormulario();
+      alert("¡Registro guardado y sincronizado!");
+    }
+
+    function limpiarFormulario() {
+      document.getElementById('reg-cedula').value = '';
+      document.getElementById('reg-nombre').value = '';
+      document.getElementById('reg-telefono').value = '';
+      document.getElementById('reg-tipo').selectedIndex = 0;
+      document.getElementById('aviso-existente').classList.add('hidden');
+      document.getElementById('contenedor-bombonas').innerHTML = '';
+      agregarFilaBombona();
+    }
+
+    function renderizarTabla() {
+      const tbody = document.getElementById('tabla-registros-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (registrosGas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay registros cargados aún.</td></tr>`;
+        return;
+      }
+      registrosGas.forEach((r, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b";
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-slate-700">${r.cedula}</td>
+          <td class="p-3">${r.nombre}<br><span class="text-[10px] text-slate-400">${r.tipo || ''}</span></td>
+          <td class="p-3">${r.telefono || ''}</td>
+          <td class="p-3 font-mono text-emerald-800">${r.bombonasTexto || ''}</td>
+          <td class="p-3 text-center flex justify-center gap-2">
+            <button type="button" onclick="cargarParaEditar('${r.cedula}')" class="bg-amber-100 text-amber-700 px-2 py-1 rounded hover:bg-amber-200" title="Editar">✏️</button>
+            <button type="button" onclick="eliminarRegistro(${idx})" class="bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200" title="Eliminar">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function cargarParaEditar(cedula) {
+      document.getElementById('reg-cedula').value = cedula;
+      buscarCedula();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function eliminarRegistro(index) {
+      const reg = registrosGas[index];
+      if (!reg || !confirm("¿Estás seguro de eliminar este registro?")) return;
+      registrosGas.splice(index, 1);
+      localStorage.setItem('registrosGas', JSON.stringify(registrosGas));
+      renderizarTabla();
+      if (sbClient) {
+        await sbClient.from('vecinos_gas').delete().eq('cedula', String(reg.cedula));
+      }
+    }
+
+    function filtrarTabla() {
+      const filtro = document.getElementById('filtro-tabla').value.toLowerCase();
+      document.querySelectorAll('#tabla-registros-body tr').forEach(fila => {
+        fila.style.display = fila.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+      });
+    }
+
+    // --- PESTAÑA 2: CAMPAÑAS ---
+    function prepararNuevaCampana() {
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      if (rol !== "ADMIN") return;
+      const hoy = new Date();
+      const fechaIso = hoy.toISOString().split('T')[0];
+      document.getElementById("camp-fecha").value = fechaIso;
+      const mesAnioActual = hoy.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+      const mesAnioTexto = mesAnioActual.charAt(0).toUpperCase() + mesAnioActual.slice(1);
+      const mesStr = String(hoy.getMonth() + 1).padStart(2, '0');
+      const anioStr = hoy.getFullYear();
+      const prefijoMes = `${anioStr}-${mesStr}`;
+      const campanasmMes = campanasGas.filter(c => c.id && String(c.id).startsWith(prefijoMes));
+      const contador = campanasmMes.length + 1;
+      document.getElementById("camp-id").value = `${prefijoMes}-${String(contador).padStart(2, '0')}`;
+      document.getElementById("camp-nombre").value = `Operativo ${contador} - ${mesAnioTexto}`;
+      document.getElementById("camp-precio-10").value = "";
+      document.getElementById("camp-precio-18").value = "";
+      document.getElementById("camp-precio-43").value = "";
+    }
+
+    async function guardarCampana() {
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      if (rol !== "ADMIN") {
+        alert("Solo los administradores pueden crear o editar campañas.");
+        return;
+      }
+
+      const idInput = document.getElementById("camp-id").value.trim();
+      const nombre = document.getElementById("camp-nombre").value.trim();
+      const fecha = document.getElementById("camp-fecha").value;
+      const precio10 = parseFloat(document.getElementById("camp-precio-10").value) || 0;
+      const precio18 = parseFloat(document.getElementById("camp-precio-18").value) || 0;
+      const precio43 = parseFloat(document.getElementById("camp-precio-43").value) || 0;
+
+      if (!nombre || !fecha) {
+        alert("El nombre y la fecha del operativo son obligatorios.");
+        return;
+      }
+
+      const esEdicionExistente = campanasGas.some(c => String(c.id) === String(idInput));
+      const campanaAbierta = campanasGas.find(c => (c.estado || c.ESTADO) === "ACTIVA");
+      if (!esEdicionExistente && campanaAbierta) {
+        alert(`⚠️ Ya existe una campaña abierta: "${campanaAbierta.nombre}". Culmínala antes de crear otra.`);
+        return;
+      }
+
+      const idCampana = idInput || ("CAMP-" + Date.now());
+      const index = campanasGas.findIndex(c => String(c.id) === String(idCampana));
+      const datosCampana = {
+        id: idCampana,
+        nombre,
+        fecha,
+        precio10,
+        precio18,
+        precio43,
+        estado: index >= 0 ? campanasGas[index].estado : "ACTIVA",
+        montoGeneral: index >= 0 ? (campanasGas[index].montoGeneral || 0) : 0,
+        totalPagoMovil: index >= 0 ? (campanasGas[index].totalPagoMovil || 0) : 0,
+        totalEfectivo: index >= 0 ? (campanasGas[index].totalEfectivo || 0) : 0,
+        netoPdvsa: index >= 0 ? (campanasGas[index].netoPdvsa || 0) : 0,
+        totalPropinas: index >= 0 ? (campanasGas[index].totalPropinas || 0) : 0
+      };
+
+      if (index >= 0) campanasGas[index] = datosCampana;
+      else campanasGas.unshift(datosCampana);
+
+      localStorage.setItem("campanasGas", JSON.stringify(campanasGas));
+      renderizarTodoLocal();
+
+      if (sbClient) {
+        const { error } = await sbClient.from('campanas_gas').upsert({
+          id_campana: datosCampana.id,
+          nombre: datosCampana.nombre,
+          fecha: datosCampana.fecha,
+          precio_10kg: datosCampana.precio10,
+          precio_18kg: datosCampana.precio18,
+          precio_43kg: datosCampana.precio43,
+          estado: datosCampana.estado,
+          creado_por: localStorage.getItem('gas_usuario') || 'Jorge'
+        }, { onConflict: 'id_campana' });
+
+        if (error) {
+          alert("⚠️ Error en Supabase al guardar campaña: " + error.message);
+          return;
+        }
+      }
+
+      prepararNuevaCampana();
+      alert("¡Campaña guardada en Supabase!");
+    }
+
+    function editarCampana(id) {
+      const camp = campanasGas.find(c => String(c.id) === String(id));
+      if (!camp) return;
+      document.getElementById("camp-id").value = camp.id;
+      document.getElementById("camp-nombre").value = camp.nombre;
+      document.getElementById("camp-fecha").value = camp.fecha;
+      document.getElementById("camp-precio-10").value = camp.precio10;
+      document.getElementById("camp-precio-18").value = camp.precio18;
+      document.getElementById("camp-precio-43").value = camp.precio43;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function culminarCampana(id) {
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      if (rol !== "ADMIN") {
+        alert("Solo un Administrador puede culminar una campaña.");
+        return;
+      }
+      const camp = campanasGas.find(c => String(c.id) === String(id));
+      if (!camp) return;
+
+      const pendientesEntrega = obtenerItemsAptosEntrega(id).filter(x => x.estadoEntrega !== 'ENTREGADA');
+      if (pendientesEntrega.length > 0) {
+        alert(`⛔ Aún faltan ${pendientesEntrega.length} bombona(s) por entregar en patio en esta campaña.`);
+        return;
+      }
+
+      if (!confirm(`¿Culminar la campaña "${camp.nombre}" y abrir el mensaje de cierre por WhatsApp?`)) return;
+
+      camp.estado = "CULMINADA";
+      localStorage.setItem("campanasGas", JSON.stringify(campanasGas));
+      renderizarTodoLocal();
+
+      if (sbClient) {
+        await sbClient.from('campanas_gas').update({
+          estado: 'CULMINADA',
+          cerrado_en: new Date().toISOString()
+        }).eq('id_campana', id);
+      }
+
+      const textoCierreWs = [
+        "🔥 *GAS VECINAL LAS MERCEDES* 🔥",
+        "_(Sector 1, Calle 2, Quebrada de Lele)_",
+        "",
+        `📢 *${camp.nombre}* se da por *CULMINADA* oficialmente.`,
+        "• Entregas en patio completadas",
+        `• Cerrado por: ${localStorage.getItem("gas_usuario") || "Administrador"}`
+      ].join("\n");
+      window.open(`https://wa.me/?text=${encodeURIComponent(textoCierreWs)}`, "_blank", "noopener,noreferrer");
+    }
+
+    function renderizarCampanas() {
+      const contenedor = document.getElementById("contenedor-historial-campanas");
+      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      if (!contenedor) return;
+      contenedor.innerHTML = "";
+      if (campanasGas.length === 0) {
+        contenedor.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs border border-dashed rounded-xl">No hay campañas registradas aún.</div>`;
+        return;
+      }
+      campanasGas.forEach(c => {
+        const esActiva = c.estado === "ACTIVA";
+        const bordeColor = esActiva ? "border-amber-400 bg-amber-50/30" : "border-slate-200 bg-slate-50 opacity-80";
+        const badgeEstado = esActiva
+          ? `<span class="bg-amber-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">ACTIVA</span>`
+          : `<span class="bg-slate-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">CULMINADA</span>`;
+        const controlesAdmin = rol === "ADMIN" ? `
+          <div class="flex justify-end gap-2 mt-3 pt-2 border-t border-slate-200/70">
+            <button type="button" onclick="editarCampana('${c.id}')" class="text-xs bg-white border border-slate-300 text-slate-700 px-3 py-1 rounded-lg hover:bg-slate-100 font-medium">
+              <i class="fa-solid fa-pen mr-1"></i> Editar
+            </button>
+            ${esActiva ? `<button type="button" onclick="culminarCampana('${c.id}')" class="text-xs bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 font-semibold shadow-sm"><i class="fa-solid fa-flag-checkered mr-1"></i> Culminar</button>` : ''}
+          </div>` : "";
+
+        const card = document.createElement("div");
+        card.className = `border-2 ${bordeColor} rounded-xl p-4 transition`;
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm">${c.nombre}</h3>
+              <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${c.fecha} <span class="ml-2 font-mono text-[10px] text-slate-400">[ID: ${c.id}]</span></p>
+            </div>
+            ${badgeEstado}
+          </div>
+          <div class="grid grid-cols-3 gap-2 bg-white p-2.5 rounded-lg border border-slate-200/80 text-xs">
+            <div><span class="text-slate-400">10kg:</span> <strong class="text-slate-700">Bs. ${Number(c.precio10 || 0).toFixed(2)}</strong></div>
+            <div><span class="text-slate-400">18kg:</span> <strong class="text-slate-700">Bs. ${Number(c.precio18 || 0).toFixed(2)}</strong></div>
+            <div><span class="text-slate-400">43kg:</span> <strong class="text-slate-700">Bs. ${Number(c.precio43 || 0).toFixed(2)}</strong></div>
+          </div>
+          ${controlesAdmin}
+        `;
+        contenedor.appendChild(card);
+      });
+    }
+
+    function actualizarSelectCampanasPago() {
+      const select = document.getElementById('pago-campana-select');
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      if (!campanasGas.length) {
+        select.innerHTML = `<option value="2026-11-01">Operativo 1 - Noviembre 2026 (ACTIVA)</option>`;
+        return;
+      }
+      campanasGas.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.nombre} (${c.estado || 'ACTIVA'})`;
+        if (prev && String(opt.value) === String(prev)) opt.selected = true;
+        else if (!prev && c.estado === 'ACTIVA') opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    // --- PESTAÑA 3: PAGOS, COTEJO Y CSV ---
+    function buscarVecinoParaPago(cedulaIngresada) {
+      const inputCedula = document.getElementById('pago-cedula');
+      const inputNombre = document.getElementById('pago-nombre');
+      const selectBombona = document.getElementById('pago-bombona-select');
+      const cedulaBuscada = String(cedulaIngresada || inputCedula.value).trim();
+      if (!cedulaBuscada) {
+        alert("Por favor ingrese un número de cédula.");
+        return;
+      }
+      const encontrados = registrosGas.filter(r => String(r.cedula).trim() === cedulaBuscada);
+      if (!encontrados.length) {
+        inputNombre.value = "";
+        selectBombona.innerHTML = '<option value="">No hay bombonas registradas</option>';
+        alert(`⚠️ La cédula "${cedulaBuscada}" no se encuentra registrada.`);
+        return;
+      }
+      inputNombre.value = encontrados[0].nombre || '';
+      selectBombona.innerHTML = '<option value="">Seleccione la bombona a pagar...</option>';
+      encontrados.forEach((reg, idx) => {
+        (reg.bombonasDetalle || []).forEach((b, bIdx) => {
+          const numB = String(b.serial || 'S/N').trim();
+          const tamB = String(b.tamano || '').trim();
+          const opt = document.createElement('option');
+          opt.value = `${numB}__${idx}_${bIdx}`;
+          opt.dataset.numeroBombona = numB;
+          opt.dataset.tamanoBombona = tamB;
+          opt.textContent = `N° ${numB} - ${tamB}`;
+          selectBombona.appendChild(opt);
+        });
+      });
+      mostrarPrecioBombonaSeleccionada();
+    }
+
+    function obtenerPrecioBombonaEnCampana(tamanoTexto) {
+      const campanaId = document.getElementById("pago-campana-select")?.value || "";
+      const campana = campanasGas.find(c => String(c.id) === String(campanaId))
+        || campanasGas.find(c => c.estado === "ACTIVA")
+        || campanasGas[0];
+      const t = String(tamanoTexto || "").toLowerCase();
+      if (!campana) return 0;
+      if (t.includes("10")) return Number(campana.precio10) || 0;
+      if (t.includes("18")) return Number(campana.precio18) || 0;
+      if (t.includes("43")) return Number(campana.precio43) || 0;
+      return 0;
+    }
+
+    function mostrarPrecioBombonaSeleccionada() {
+      const selectBombona = document.getElementById("pago-bombona-select");
+      const avisoEl = document.getElementById("aviso-precio-bombona");
+      if (!selectBombona || !avisoEl) return;
+      if (!selectBombona.value) {
+        avisoEl.textContent = "";
+        return;
+      }
+      const op = selectBombona.options[selectBombona.selectedIndex];
+      const tamano = op?.dataset?.tamanoBombona || "";
+      const precio = obtenerPrecioBombonaEnCampana(tamano);
+      avisoEl.textContent = `Precio en campaña (${tamano}): Bs. ${precio.toFixed(2)} — Pulsa "+ Adicionar".`;
+    }
+
+    function refrescarPreciosCarritoYSeleccion() {
+      bombonasSeleccionadasPago = bombonasSeleccionadasPago.map(item => ({
+        ...item,
+        precio: obtenerPrecioBombonaEnCampana(item.tamano)
+      }));
+      mostrarPrecioBombonaSeleccionada();
+      refrescarResumenPagoMixto();
+    }
+
+    function agregarBombonaAlCarrito() {
+      const selectBombona = document.getElementById("pago-bombona-select");
+      if (!selectBombona || !selectBombona.value) {
+        alert("Selecciona primero una bombona del vecino.");
+        return;
+      }
+      const cedula = (document.getElementById("pago-cedula")?.value || "").trim();
+      const campanaId = (document.getElementById("pago-campana-select")?.value || "").trim();
+      const op = selectBombona.options[selectBombona.selectedIndex];
+      const numero = String(op?.dataset?.numeroBombona || "S/N").trim().toUpperCase();
+      const tamano = String(op?.dataset?.tamanoBombona || "").trim();
+      const clave = `${cedula}__${numero}__${tamano}`;
+
+      if (bombonasSeleccionadasPago.some(x => x.clave === clave)) {
+        alert("Esa bombona ya está agregada en este pago.");
+        return;
+      }
+
+      if (numero && numero !== "S/N") {
+        const yaPagada = pagosRegistradosCampana.some(p =>
+          String(p.campanaId) === campanaId &&
+          Array.isArray(p.bombonas) &&
+          p.bombonas.some(b => String(b.numero || '').trim().toUpperCase() === numero)
+        );
+        if (yaPagada) {
+          alert(`⚠️ La bombona N° ${numero} ya fue registrada como pagada en esta campaña.`);
+          return;
+        }
+      }
+
+      bombonasSeleccionadasPago.push({
+        clave,
+        cedula,
+        numero,
+        tamano,
+        precio: obtenerPrecioBombonaEnCampana(tamano)
+      });
+      refrescarResumenPagoMixto();
+    }
+
+    function quitarBombonaCarrito(index) {
+      bombonasSeleccionadasPago.splice(index, 1);
+      refrescarResumenPagoMixto();
+    }
+
+    function refrescarResumenPagoMixto() {
+      const subtotal = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+      const propina = Math.max(leerNumeroInput("pago-propina"), 0);
+      const total = Number((subtotal + propina).toFixed(2));
+
+      const listaEl = document.getElementById("lista-bombonas-carrito");
+      if (listaEl) {
+        listaEl.innerHTML = bombonasSeleccionadasPago.length === 0
+          ? `<div class="text-xs text-slate-400 italic">Aún no has agregado bombonas al cobro.</div>`
+          : bombonasSeleccionadasPago.map((b, i) => `
+              <div class="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs">
+                <span><strong>N° ${b.numero}</strong> · ${b.tamano}</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-bold text-slate-700">Bs. ${Number(b.precio).toFixed(2)}</span>
+                  <button type="button" onclick="quitarBombonaCarrito(${i})" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+                </div>
+              </div>`).join("");
+      }
+
+      document.getElementById("resumen-total-pagar").textContent = `Bs. ${total.toFixed(2)}`;
+      document.getElementById("pago-monto").value = subtotal.toFixed(2);
+
+      const inputPM = document.getElementById("pago-monto-pm");
+      const inputEf = document.getElementById("pago-monto-ef");
+      if (inputPM && inputEf && document.activeElement !== inputEf && document.activeElement !== inputPM) {
+        const efVal = Math.min(Math.max(leerNumeroInput("pago-monto-ef"), 0), total);
+        inputEf.value = efVal.toFixed(2);
+        inputPM.value = Math.max(Number((total - efVal).toFixed(2)), 0).toFixed(2);
+      }
+    }
+
+
+    
+  function confirmarDesglosePagoMixto() {
+  const subtotal = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+  const propina = Math.max(leerNumeroInput("pago-propina"), 0);
+  const total = Number((subtotal + propina).toFixed(2));
+
+  if (!bombonasSeleccionadasPago.length) {
+    alert("Agrega al menos una bombona antes de registrar el pago.");
+    return false;
+  }
+
+  const inputPM = document.getElementById("pago-monto-pm");
+  const inputEf = document.getElementById("pago-monto-ef");
+  let pm = Math.max(leerNumeroInput("pago-monto-pm"), 0);
+  let ef = Math.max(leerNumeroInput("pago-monto-ef"), 0);
+
+  if (pm === 0 && ef === 0) {
+    pm = total;
+    ef = 0;
+  } else if (Math.abs((pm + ef) - total) > 0.01) {
+    ef = Math.max(Number((total - pm).toFixed(2)), 0);
+  }
+
+  inputPM.value = pm.toFixed(2);
+  inputEf.value = ef.toFixed(2);
+
+  const estadoEl = document.getElementById("estado-confirmacion-pago");
+  if (estadoEl) {
+    estadoEl.classList.remove("hidden");
+    estadoEl.textContent = `✓ Cuadrado: Total Bs. ${total.toFixed(2)} (Pago Móvil: Bs. ${pm.toFixed(2)} | Efectivo: Bs. ${ef.toFixed(2)})`;
+  }
+  return true;
+}
+
+    function leerNumeroInput(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const limpio = String(el.value || '').trim().replace(',', '.');
+      const num = parseFloat(limpio);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function sincronizarMontosMixtos(origen) {
+      const subtotal = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+      const propina = Math.max(leerNumeroInput("pago-propina"), 0);
+      const total = Number((subtotal + propina).toFixed(2));
+      const inputPM = document.getElementById("pago-monto-pm");
+      const inputEf = document.getElementById("pago-monto-ef");
+      if (origen === "PM") {
+        const pm = Math.min(Math.max(leerNumeroInput("pago-monto-pm"), 0), total);
+        inputEf.value = Math.max(Number((total - pm).toFixed(2)), 0).toFixed(2);
+      } else {
+        const ef = Math.min(Math.max(leerNumeroInput("pago-monto-ef"), 0), total);
+        inputPM.value = Math.max(Number((total - ef).toFixed(2)), 0).toFixed(2);
+      }
+    }
+
+    function limpiarFormularioPago() {
+      document.getElementById("pago-cedula").value = "";
+      document.getElementById("pago-nombre").value = "";
+      document.getElementById("pago-bombona-select").innerHTML = '<option value="">Primero busque una cédula...</option>';
+      document.getElementById("aviso-precio-bombona").textContent = "";
+      document.getElementById("pago-propina").value = "0.00";
+      document.getElementById("pago-monto-pm").value = "0.00";
+      document.getElementById("pago-monto-ef").value = "0.00";
+      document.getElementById("pago-capture").value = "";
+      document.getElementById("preview-capture-img").classList.add("hidden");
+      document.getElementById("info-compresion-capture").textContent = "Se comprime automáticamente antes de subir a Supabase Storage (captures-gas).";
+      document.getElementById("pago-banco").value = "";
+      document.getElementById("pago-referencia").value = "";
+      document.getElementById("tercero-nombre").value = "";
+      document.getElementById("tercero-cedula").value = "";
+      const estadoEl = document.getElementById("estado-confirmacion-pago");
+      if (estadoEl) {
+        estadoEl.classList.add("hidden");
+        estadoEl.textContent = "";
+      }
+      captureComprimidoBlob = null;
+      bombonasSeleccionadasPago = [];
+      refrescarResumenPagoMixto();
+    }
+
+    async function enviarPagoVecinal(event) {
+       event.preventDefault();
+        const btnSubmit = document.getElementById('btn-submit-pago');
+         const textoOriginal = btnSubmit ? btnSubmit.textContent : 'Registrar Pago y Validar';
+
+        if (!confirmarDesglosePagoMixto()) {
+        return;
+  }
+
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Validando y guardando...";
+  }
+
+  try {
+    const campanaId = (document.getElementById('pago-campana-select')?.value || '').trim();
+    const cedula = (document.getElementById('pago-cedula')?.value || '').trim();
+    const nombre = (document.getElementById('pago-nombre')?.value || '').trim();
+    const propina = Math.max(leerNumeroInput('pago-propina'), 0);
+    const pm = Math.max(leerNumeroInput('pago-monto-pm'), 0);
+    const ef = Math.max(leerNumeroInput('pago-monto-ef'), 0);
+    const banco = (document.getElementById('pago-banco')?.value || '').trim();
+    const referencia = (document.getElementById('pago-referencia')?.value || '').trim();
+    const terceroNombre = (document.getElementById('tercero-nombre')?.value || '').trim();
+    const terceroCedula = (document.getElementById('tercero-cedula')?.value || '').trim();
+    const subtotalBombones = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+    const totalPagar = Number((subtotalBombones + propina).toFixed(2));
+
+    if (!cedula || !bombonasSeleccionadasPago.length) {
+      alert("Verifica la cédula y agrega al menos una bombona antes de registrar.");
+      return;
+    }
+
+    const bancoLimpio = banco.toUpperCase();
+    const refLimpia = referencia.toUpperCase();
+
+    if (pm > 0) {
+      if (!bancoLimpio) {
+        alert("Selecciona el Banco Emisor para el Pago Móvil antes de registrar.");
+        return;
+      }
+      if (!refLimpia) {
+        alert("Indica el N° de Referencia del Pago Móvil antes de registrar.");
+        return;
+      }
+
+      const duplicado = Array.isArray(pagosRegistradosCampana) && pagosRegistradosCampana.some(p =>
+        String(p.referencia || '').trim().toUpperCase() === refLimpia &&
+        String(p.banco || '').trim().toUpperCase() === bancoLimpio &&
+        (!campanaId || String(p.campanaId || '').trim() === campanaId)
+      );
+
+      if (duplicado) {
+        alert(`Ya existe un pago registrado con la referencia "${referencia}" en el banco "${banco}" en esta campaña.`);
+        return;
+      }
+    }
+
+    const nuevoPago = {
+      id: Date.now(),
+      campanaId,
+      cedula,
+      nombre,
+      bombonas: [...bombonasSeleccionadasPago],
+      subtotalBombones,
+      propina,
+      totalPagar,
+      total: totalPagar,
+      pm,
+      ef,
+      banco,
+      referencia,
+      terceroNombre,
+      terceroCedula,
+      fecha: new Date().toISOString()
+    };
+
+    if (!Array.isArray(pagosRegistradosCampana)) {
+      window.pagosRegistradosCampana = [];
+    }
+    pagosRegistradosCampana.unshift(nuevoPago);
+    localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
+
+    if (typeof renderizarTablaPagos === 'function') {
+      renderizarTablaPagos();
+    }
+    if (typeof limpiarFormularioPago === 'function') {
+      limpiarFormularioPago();
+    }
+
+    alert(`✓ Pago registrado: Total Bs. ${totalPagar.toFixed(2)}`);
+  } catch (err) {
+    console.error("Error al registrar pago:", err);
+    alert("Ocurrió un error al validar o guardar el pago.");
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = textoOriginal;
+    }
+  }
+}
+
+    function renderizarTablaPagos() {
+      const tbody = document.getElementById('tabla-pagos-body');
+      const badge = document.getElementById('contador-pagos-badge');
+      const campanaActual = (document.getElementById('pago-campana-select')?.value || '').trim();
+      const pagosFiltrados = campanaActual
+        ? pagosRegistradosCampana.filter(p => !p.campanaId || String(p.campanaId).trim() === campanaActual)
+        : pagosRegistradosCampana;
+
+      if (badge) badge.textContent = `${pagosFiltrados.length} ${pagosFiltrados.length === 1 ? 'pago' : 'pagos'}`;
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!pagosFiltrados.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay pagos registrados en esta campaña aún.</td></tr>`;
+        return;
+      }
+
+      pagosFiltrados.forEach((p, idx) => {
+        const refTexto = p.referencia ? `${p.referencia} (${p.banco || 'N/A'})` : 'Efectivo';
+      const montoMostrar = Number(p.totalPagar ?? p.total ?? p.monto ?? (Number(p.pm || 0) + Number(p.ef || 0)) ?? 0).toFixed(2);
+        const bombonasTexto = Array.isArray(p.bombonas) && p.bombonas.length
+          ? p.bombonas.map(b => `N° ${b.numero} (${b.tamano})`).join(' · ')
+          : 'Bombona';
+        const idPago = p.id || idx;
+        const estadoCotejo = p.cotejadoBanco
+          ? `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">COTEJADO</span>`
+          : `<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">PENDIENTE</span>`;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 border-b';
+        tr.innerHTML = `
+          <td class="p-2.5">
+            <strong>${p.cedula || ''}</strong> · <span class="text-slate-700">${p.nombre || ''}</span><br>
+            <span class="text-[11px] font-semibold text-emerald-700">${bombonasTexto}</span>
+          </td>
+          <td class="p-2.5 font-mono">${refTexto}</td>
+          <td class="p-2.5 font-bold text-emerald-700">Bs. ${montoMostrar}</td>
+          <td class="p-2.5 space-y-1">
+            ${estadoCotejo}
+            <div class="flex gap-1.5">
+              ${p.captureUrl ? `<button type="button" onclick="verCaptureEnVisor('${idPago}')" class="text-[11px] text-blue-700 underline font-semibold">Ver Capture</button>` : `<span class="text-[10px] text-slate-400">Sin capture</span>`}
+              <button type="button" onclick="alternarCotejoPago('${idPago}')" class="text-[11px] text-emerald-700 underline font-semibold">Cotejar</button>
+            </div>
+          </td>
+          <td class="p-2.5 text-center space-y-1">
+            <button type="button" onclick="copiarComprobantePago('${idPago}')" class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-[11px] font-semibold block mx-auto" title="Copiar comprobante">Ticket</button>
+            <button type="button" onclick="eliminarPago('${idPago}')" class="text-red-500 hover:text-red-700 text-xs block mx-auto" title="Eliminar">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function verCaptureEnVisor(idPago) {
+      const p = pagosRegistradosCampana.find(x => String(x.id) === String(idPago));
+      const metaEl = document.getElementById('visor-cotejo-meta');
+      const contEl = document.getElementById('visor-cotejo-contenido');
+      if (!p || !contEl) return;
+
+      metaEl.textContent = `${p.nombre} (CI ${p.cedula}) · Ref: ${p.referencia || 'N/A'} · Banco: ${p.banco || 'N/A'} · Bs. ${Number(p.totalPagar || 0).toFixed(2)}`;
+      contEl.innerHTML = p.captureUrl
+        ? `<div class="flex flex-col sm:flex-row gap-3 items-start">
+             <img src="${p.captureUrl}" alt="Capture de pago" class="max-h-52 rounded-lg border object-contain bg-white">
+             <div class="space-y-1 text-slate-700">
+               <div><strong>Cotejado:</strong> ${p.cotejadoBanco ? 'Sí (' + (p.cotejadoPor || 'Admin') + ')' : 'Pendiente'}</div>
+               <div><strong>Tercero:</strong> ${p.terceroNombre ? p.terceroNombre + ' (' + p.terceroCedula + ')' : 'No'}</div>
+               <a href="${p.captureUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-1 text-blue-700 underline font-semibold">Abrir imagen original en nueva pestaña</a>
+             </div>
+           </div>`
+        : `<span class="text-slate-400 italic">Este pago no tiene capture adjunto en Storage.</span>`;
+    }
+
+    async function alternarCotejoPago(idPago) {
+      const idx = pagosRegistradosCampana.findIndex(x => String(x.id) === String(idPago));
+      if (idx === -1) return;
+      const actual = Boolean(pagosRegistradosCampana[idx].cotejadoBanco);
+      const nuevoEstado = !actual;
+      const usuario = localStorage.getItem('gas_usuario') || 'Jorge';
+
+      pagosRegistradosCampana[idx].cotejadoBanco = nuevoEstado;
+      pagosRegistradosCampana[idx].cotejadoPor = nuevoEstado ? usuario : '';
+      localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
+      renderizarTablaPagos();
+
+      if (sbClient) {
+        await sbClient.from('pagos_gas').update({
+          cotejado_banco: nuevoEstado,
+          cotejado_por: nuevoEstado ? usuario : '',
+          cotejado_en: nuevoEstado ? new Date().toISOString() : null
+        }).eq('lote_pago', String(idPago));
+      }
+    }
+
+    function copiarComprobantePago(idPago) {
+      const p = pagosRegistradosCampana.find(x => String(x.id) === String(idPago));
+      if (!p) return;
+      const bombonasTxt = (p.bombonas || []).map(b => `N° ${b.numero} (${b.tamano})`).join(', ');
+      const txt = [
+        "*Gas Vecinal Las Mercedes* (Sector 1, Calle 2, Quebrada de Lele)",
+        `Comprobante de Pago · Campaña: *${p.campanaId}*`,
+        `Vecino: *${p.nombre}* (CI: ${p.cedula})`,
+        `Cilindros: ${bombonasTxt}`,
+        `Total pagado: *Bs. ${Number(p.totalPagar || 0).toFixed(2)}* (PM: ${Number(p.pm || 0).toFixed(2)} | Ef: ${Number(p.ef || 0).toFixed(2)})`,
+        p.referencia ? `Ref: *${p.referencia}* · Banco: *${p.banco || 'N/A'}*` : "Método: Efectivo"
+      ].join('\n');
+      navigator.clipboard.writeText(txt)
+        .then(() => alert("✅ Comprobante copiado listo para pegar en WhatsApp."))
+        .catch(() => alert(txt));
+    }
+
+    async function eliminarPago(idPago) {
+      if (!confirm('¿Eliminar este registro de pago?')) return;
+      pagosRegistradosCampana = pagosRegistradosCampana.filter(p => String(p.id) !== String(idPago));
+      localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
+      renderizarTablaPagos();
+      renderizarResumenPdvsa();
+      if (sbClient) {
+        await sbClient.from('pagos_gas').delete().eq('lote_pago', String(idPago));
+      }
+    }
+
+    function exportarPagosCsv() {
+      const campanaActual = (document.getElementById('pago-campana-select')?.value || document.getElementById('resumen-campana-select')?.value || '').trim();
+      const lista = campanaActual
+        ? pagosRegistradosCampana.filter(p => String(p.campanaId) === campanaActual)
+        : pagosRegistradosCampana;
+
+      const encabezados = [
+        "Lote", "Campana", "Cedula", "Nombre", "Bombonas", "Monto_Bombonas",
+        "Propina", "Total_Pagar", "Pago_Movil", "Efectivo", "Banco",
+        "Referencia", "Cotejado_Banco", "Capture_URL", "Tercero_Nombre", "Tercero_Cedula"
+      ];
+
+      const escaparHtml = (v) => String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+      const ths = encabezados.map(h => `<th style="background:#065f46;color:#ffffff;border:1px solid #cbd5e1;padding:6px;">${escaparHtml(h)}</th>`).join('');
+
+      const trs = lista.map(p => {
+        const urlCapture = String(p.captureUrl || '').trim();
+        const celdaCapture = urlCapture
+          ? `<a href="${escaparHtml(urlCapture)}" target="_blank" rel="noopener noreferrer" style="color:#1d4ed8;text-decoration:underline;font-weight:bold;">Abrir Capture</a>`
+          : 'Sin capture';
+
+        const celdasHtml = [
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.id)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.campanaId)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.cedula)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.nombre)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml((p.bombonas || []).map(b => `${b.numero} (${b.tamano})`).join(' | '))}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${Number(p.subtotalBombonas || 0).toFixed(2)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${Number(p.propina || 0).toFixed(2)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${Number(p.totalPagar || 0).toFixed(2)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${Number(p.pm || 0).toFixed(2)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${Number(p.ef || 0).toFixed(2)}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.banco || '')}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.referencia || '')}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${p.cotejadoBanco ? 'SI' : 'NO'}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;">${celdaCapture}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.terceroNombre || '')}</td>`,
+          `<td style="border:1px solid #cbd5e1;padding:5px;mso-number-format:'\\@';">${escaparHtml(p.terceroCedula || '')}</td>`
+        ];
+
+        return `<tr>${celdasHtml.join('')}</tr>`;
+      }).join('');
+
+      const htmlExcel = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head><meta charset="UTF-8"></head>
+        <body>
+          <table>
+            <thead><tr>${ths}</tr></thead>
+            <tbody>${trs}</tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(["\uFEFF" + htmlExcel], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `gas_vecinal_pagos_${campanaActual || 'cierre'}.htm`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // --- PESTAÑA 4: RECEPCIÓN PATIO Y AVERÍAS ---
+    function actualizarSelectCampanasAverias() {
+      const select = document.getElementById('averia-campana-select');
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      if (!campanasGas.length) {
+        select.innerHTML = `<option value="2026-11-01">Operativo 1 - Noviembre 2026 (ACTIVA)</option>`;
+        return;
+      }
+      campanasGas.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.nombre} (${c.estado || 'ACTIVA'})`;
+        if (prev && String(opt.value) === String(prev)) opt.selected = true;
+        else if (!prev && c.estado === 'ACTIVA') opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function buscarVecinoParaAveria(cedulaIngresada, silencioso = false) {
+      const cedulaBuscada = String(cedulaIngresada || '').trim();
+      const campanaId = (document.getElementById('averia-campana-select')?.value || '').trim();
+      const listaEl = document.getElementById('lista-bombonas-pagadas-vecino');
+      const badgeEl = document.getElementById('contador-bombonas-pagadas-vecino');
+      if (!cedulaBuscada) {
+        if (!silencioso) alert("Ingrese una cédula para buscar las bombonas pagadas del vecino.");
+        return;
+      }
+
+      const regLocal = registrosGas.find(r => String(r.cedula).trim() === cedulaBuscada);
+      let nombreVecino = regLocal?.nombre || '';
+      let telefonoVecino = regLocal?.telefono || '';
+      let pagadas = [];
+
+      pagosRegistradosCampana.forEach((p, pIdx) => {
+        const mismaCamp = !campanaId || !p.campanaId || String(p.campanaId).trim() === campanaId;
+        if (mismaCamp && String(p.cedula).trim() === cedulaBuscada) {
+          if (!nombreVecino) nombreVecino = p.nombre || '';
+          (p.bombonas || []).forEach((b, bIdx) => {
+            pagadas.push({
+              key: `${p.id || pIdx}_${bIdx}`,
+              numero: String(b.numero || 'S/N').trim().toUpperCase(),
+              tamano: String(b.tamano || '').trim(),
+              precio: Number(b.precio) || obtenerPrecioBombonaEnCampana(b.tamano) || 0,
+              recibida: false,
+              tieneAveria: false
+            });
+          });
+        }
+      });
+
+      const enPatio = averiasPatioGas.filter(a =>
+        (!campanaId || !a.campanaId || String(a.campanaId).trim() === campanaId) &&
+        String(a.cedula).trim() === cedulaBuscada
+      );
+
+      pagadas = pagadas.map(b => {
+        const match = enPatio.find(a =>
+          (b.numero !== 'S/N' && String(a.numeroBombona).toUpperCase() === b.numero) ||
+          (b.numero === 'S/N' && String(a.tamano).toLowerCase() === b.tamano.toLowerCase())
+        );
+        return {
+          ...b,
+          recibida: Boolean(match && match.recibidaEnPatio !== false),
+          tieneAveria: Boolean(match && match.esAveria)
+        };
+      });
+
+      bombonasPagadasVecinoPatio = pagadas;
+      if (nombreVecino) document.getElementById('averia-nombre').value = nombreVecino;
+      if (telefonoVecino) document.getElementById('averia-telefono').value = telefonoVecino;
+      if (badgeEl) badgeEl.textContent = `${pagadas.length} bombona(s) pagada(s)`;
+
+      if (!pagadas.length) {
+        listaEl.innerHTML = `<div class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2.5">No se encontraron bombonas pagadas para la cédula <strong>${cedulaBuscada}</strong> en esta campaña.</div>`;
+        actualizarPanelAveriaPorSeleccion();
+        return;
+      }
+
+      listaEl.innerHTML = pagadas.map((b, idx) => `
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs">
+          <div>
+            <strong class="font-mono text-slate-800">N° ${b.numero}</strong>
+            <span class="text-slate-600">· ${b.tamano}</span>
+            <span class="ml-1 font-bold text-emerald-700">(Bs. ${Number(b.precio || 0).toFixed(2)})</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="flex items-center gap-1 font-semibold text-emerald-700 cursor-pointer">
+              <input type="checkbox" ${b.recibida ? 'checked' : ''} onchange="bombonasPagadasVecinoPatio[${idx}].recibida = this.checked" class="rounded text-emerald-600">
+              <span>Recibida</span>
+            </label>
+            <label class="flex items-center gap-1 font-semibold text-red-700 cursor-pointer">
+              <input type="checkbox" ${b.tieneAveria ? 'checked' : ''} onchange="toggleAveriaBombonaPatio(${idx}, this.checked)" class="rounded text-red-600">
+              <span>Avería</span>
+            </label>
+          </div>
+        </div>
+      `).join('');
+      actualizarPanelAveriaPorSeleccion();
+    }
+
+    function toggleAveriaBombonaPatio(idx, checked) {
+      if (!bombonasPagadasVecinoPatio[idx]) return;
+      bombonasPagadasVecinoPatio[idx].tieneAveria = Boolean(checked);
+      if (checked) bombonasPagadasVecinoPatio[idx].recibida = true;
+      actualizarPanelAveriaPorSeleccion();
+    }
+
+    function actualizarPanelAveriaPorSeleccion() {
+      const panel = document.getElementById('panel-detalle-averia-patio');
+      const averiadas = bombonasPagadasVecinoPatio.filter(b => b.tieneAveria);
+      if (!panel) return;
+      if (!averiadas.length) {
+        panel.classList.add('hidden');
+        document.getElementById('averia-monto-devolver').value = '0.00';
+        return;
+      }
+      panel.classList.remove('hidden');
+      document.getElementById('averia-bombona-activa-label').textContent = averiadas.map(b => `N° ${b.numero} (${b.tamano})`).join(', ');
+      const suma = averiadas.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+      document.getElementById('averia-monto-devolver').value = suma.toFixed(2);
+    }
+
+    function limpiarFormularioAveria() {
+      bombonasPagadasVecinoPatio = [];
+      document.getElementById('averia-cedula').value = '';
+      document.getElementById('averia-nombre').value = '';
+      document.getElementById('averia-telefono').value = '';
+      document.getElementById('lista-bombonas-pagadas-vecino').innerHTML = `<div class="text-xs text-slate-400 italic">Busque una cédula para ver las bombonas pagadas del vecino.</div>`;
+      document.getElementById('contador-bombonas-pagadas-vecino').textContent = '0 bombonas';
+      document.getElementById('panel-detalle-averia-patio').classList.add('hidden');
+      document.getElementById('averia-devuelto-ya').checked = false;
+      document.getElementById('averia-monto-devolver').value = '0.00';
+      document.getElementById('averia-observacion').value = '';
+    }
+
+    async function registrarRecepcionPatio(event) {
+      event.preventDefault();
+      const campanaId = (document.getElementById('averia-campana-select')?.value || '').trim();
+      const cedula = (document.getElementById('averia-cedula')?.value || '').trim();
+      const nombre = (document.getElementById('averia-nombre')?.value || '').trim();
+      const telefono = (document.getElementById('averia-telefono')?.value || '').trim();
+      const seleccionadas = bombonasPagadasVecinoPatio.filter(b => b.recibida || b.tieneAveria);
+
+      if (!campanaId || !nombre) {
+        alert("⚠️ Seleccione la campaña y busque la cédula del vecino.");
+        return;
+      }
+      if (!seleccionadas.length) {
+        alert("⚠️ Tilde al menos una bombona pagada como 'Recibida' o 'Avería'.");
+        return;
+      }
+
+      const usuarioActual = localStorage.getItem('gas_usuario') || 'Jorge';
+      const rolActual = localStorage.getItem('gas_rol') || 'ADMIN';
+      const motivo = document.getElementById('averia-motivo').value;
+      const estadoPatio = document.getElementById('averia-estado').value;
+      const metodoDevolucion = document.getElementById('averia-metodo-devolucion').value;
+      const marcadoYa = Boolean(document.getElementById('averia-devuelto-ya').checked);
+      const observacion = document.getElementById('averia-observacion').value.trim();
+      const montoManualAveria = parseFloat(document.getElementById('averia-monto-devolver').value) || 0;
+      const averiadas = seleccionadas.filter(b => b.tieneAveria);
+
+      const serialesYaEnPatio = new Set(
+    (typeof averiasPatioGas !== 'undefined' ? averiasPatioGas : [])
+      .filter(a => String(a.campanaId || '').trim() === String(campanaId || '').trim() && String(a.cedula || '').trim() === String(cedula || '').trim())
+      .map(a => String(a.numeroBombona || '').trim().toUpperCase())
+      .filter(s => s && s !== 'S/N')
+  );
+
+    const seleccionadasSinDup = seleccionadas.filter((b) => {
+    const serial = String(b.numero || '').trim().toUpperCase();
+    if (!serial || serial === 'S/N') return true;
+    if (serialesYaEnPatio.has(serial)) return false;
+    serialesYaEnPatio.add(serial);
+    return true;
+  });
+
+      const nuevos = seleccionadasSinDup.map((b, i) => {
+      const esAv = Boolean(b.tieneAveria);
+      const montoItem = esAv
+          ? (averiadas.length === 1 && montoManualAveria > 0 ? montoManualAveria : (Number(b.precio) || 0))
+          : 0;
+        return {
+          id: `PAT-${Date.now()}-${i}`,
+          campanaId,
+          cedula,
+          nombre,
+          telefono,
+          numeroBombona: b.numero || 'S/N',
+          tamano: b.tamano || 'Gde (43kg)',
+          recibidaEnPatio: true,
+          esAveria: esAv,
+          motivo: esAv ? motivo : 'Recibida conforme para planta de llenado',
+          estadoPatio: esAv ? estadoPatio : 'Recibida en Patio (Envío a Planta)',
+          observacion: esAv ? observacion : '',
+          montoDevuelto: montoItem,
+          metodoDevolucion: esAv ? metodoDevolucion : '',
+          estadoReembolso: esAv ? (marcadoYa ? 'PAGO_DEVUELTO' : 'PENDIENTE_DEVOLUCION') : 'NO_APLICA',
+          conciliadoPor: esAv && marcadoYa ? `${usuarioActual} (${rolActual})` : '',
+          registradoPor: `${usuarioActual} (${rolActual})`,
+          fecha: new Date().toLocaleString('es-VE')
+        };
+      });
+
+      averiasPatioGas = [...nuevos, ...averiasPatioGas];
+      localStorage.setItem('averiasPatioGas', JSON.stringify(averiasPatioGas));
+      renderizarTablaAverias();
+      renderizarTablaEntregas();
+      renderizarResumenPdvsa();
+
+      if (sbClient) {
+        const filasSb = nuevos.map(n => ({
+          id_averia: n.id,
+          campana_id: n.campanaId,
+          cedula: n.cedula,
+          nombre: n.nombre,
+          numero_bombona: n.numeroBombona,
+          telefono: n.telefono,
+          tamano: n.tamano,
+          recibida_en_patio: n.recibidaEnPatio,
+          es_averia: n.esAveria,
+          motivo: n.motivo,
+          estado_patio: n.estadoPatio,
+          observacion: n.observacion,
+          monto_devuelto: n.montoDevuelto,
+          metodo_devolucion: n.metodoDevolucion,
+          estado_reembolso: n.estadoReembolso,
+          conciliado_por: n.conciliadoPor,
+          registrado_por: n.registradoPor
+        }));
+        await sbClient.from('averias_patio_gas').insert(filasSb);
+      }
+
+      limpiarFormularioAveria();
+      alert("✅ Recepción en patio guardada y sincronizada.");
+    }
+
+    async function confirmarPagoDevuelto(idAveria) {
+      const idx = averiasPatioGas.findIndex(a => String(a.id) === String(idAveria));
+      if (idx === -1) return;
+      const item = averiasPatioGas[idx];
+      const entrada = prompt(`Confirmar PAGO DEVUELTO para ${item.nombre} (N° ${item.numeroBombona}):\nMonto en Bs.:`, Number(item.montoDevuelto || 0).toFixed(2));
+      if (entrada === null) return;
+      const montoFinal = parseFloat(entrada);
+      if (isNaN(montoFinal) || montoFinal < 0) return;
+
+      const usuario = localStorage.getItem('gas_usuario') || 'Jorge';
+      item.montoDevuelto = montoFinal;
+      item.estadoReembolso = 'PAGO_DEVUELTO';
+      item.conciliadoPor = usuario;
+      averiasPatioGas[idx] = item;
+      localStorage.setItem('averiasPatioGas', JSON.stringify(averiasPatioGas));
+      renderizarTablaAverias();
+      renderizarResumenPdvsa();
+
+      if (sbClient) {
+        await sbClient.from('averias_patio_gas').update({
+          monto_devuelto: montoFinal,
+          estado_reembolso: 'PAGO_DEVUELTO',
+          conciliado_por: usuario
+        }).eq('id_averia', String(idAveria));
+      }
+    }
+
+    function obtenerTelefonoVecino(obj) {
+      let tel = String(obj?.telefono || '').trim();
+      if (!tel && obj?.cedula) {
+        const reg = registrosGas.find(r => String(r.cedula).trim() === String(obj.cedula).trim());
+        if (reg) tel = String(reg.telefono || '').trim();
+      }
+      let digits = tel.replace(/\D/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('0') && digits.length === 11) digits = '58' + digits.slice(1);
+      else if (digits.length === 10 && digits.startsWith('4')) digits = '58' + digits;
+      return digits;
+    }
+
+    function enviarWhatsAppRecibidasPlanta() {
+      const nombre = (document.getElementById('averia-nombre')?.value || '').trim();
+      const recibidas = bombonasPagadasVecinoPatio.filter(b => b.recibida && !b.tieneAveria);
+      if (!nombre || !recibidas.length) {
+        alert("⚠️ Busque una cédula y marque al menos una bombona como 'Recibida'.");
+        return;
+      }
+      const texto = [
+        "*Gas Vecinal Las Mercedes* (Sector 1, Calle 2, Quebrada de Lele)",
+        `Hola *${nombre}*, confirmamos que tu(s) bombona(s) fueron *RECIBIDAS EN PATIO* para envío a planta:`,
+        ...recibidas.map(b => `• N° *${b.numero}* (${b.tamano})`)
+      ].join("\n");
+      const tel = obtenerTelefonoVecino({
+        telefono: document.getElementById('averia-telefono')?.value || '',
+        cedula: document.getElementById('averia-cedula')?.value || ''
+      });
+      window.open(tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank', 'noopener,noreferrer');
+    }
+
+    function enviarWhatsAppDevolucion(idAveria) {
+      const item = averiasPatioGas.find(a => String(a.id) === String(idAveria));
+      if (!item) return;
+      const texto = [
+        "*Gas Vecinal Las Mercedes* (Sector 1, Calle 2, Quebrada de Lele)",
+        `Hola *${item.nombre}*, te informamos que el monto de tu bombona N° *${item.numeroBombona}* (${item.tamano}) ha sido marcado como *PAGO DEVUELTO* por Bs. *${Number(item.montoDevuelto || 0).toFixed(2)}* (${item.metodoDevolucion || 'Efectivo'}).`,
+        `Motivo/Observación: ${item.motivo || 'Avería'} ${item.observacion ? '— ' + item.observacion : ''}`
+      ].join("\n");
+      const tel = obtenerTelefonoVecino(item);
+      window.open(tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank', 'noopener,noreferrer');
+    }
+
+    async function eliminarAveriaLocal(idAveria) {
+      if (!confirm("¿Eliminar este registro de patio?")) return;
+      averiasPatioGas = averiasPatioGas.filter(a => String(a.id) !== String(idAveria));
+      localStorage.setItem('averiasPatioGas', JSON.stringify(averiasPatioGas));
+      renderizarTablaAverias();
+      renderizarTablaEntregas();
+      renderizarResumenPdvsa();
+      if (sbClient) {
+        await sbClient.from('averias_patio_gas').delete().eq('id_averia', String(idAveria));
+      }
+    }
+
+    function renderizarTablaAverias() {
+      const tbody = document.getElementById('tabla-averias-body');
+      const badge = document.getElementById('contador-averias-badge');
+      const devBadge = document.getElementById('total-devuelto-averias-badge');
+      const pendBadge = document.getElementById('total-pendiente-averias-badge');
+      const campanaActual = (document.getElementById('averia-campana-select')?.value || '').trim();
+      const filtro = (document.getElementById('filtro-averias')?.value || '').trim().toLowerCase();
+      if (!tbody) return;
+
+      let lista = averiasPatioGas.filter(a => !campanaActual || !a.campanaId || String(a.campanaId).trim() === campanaActual);
+      if (filtro) {
+        lista = lista.filter(a => [a.numeroBombona, a.tamano, a.cedula, a.nombre, a.motivo, a.observacion].some(v => String(v || '').toLowerCase().includes(filtro)));
+      }
+      const vistosTabla = new Set();
+    lista = lista.filter((a) => {
+    const serial = String(a.numeroBombona || '').trim().toUpperCase();
+    if (!serial || serial === 'S/N') return true;
+    const clave = `${String(a.campanaId || '').trim()}|${String(a.cedula || '').trim()}|${serial}`;
+    if (vistosTabla.has(clave)) return false;
+    vistosTabla.add(clave);
+    return true;
+  });
+      const conMonto = lista.filter(a => a.esAveria || Number(a.montoDevuelto) > 0);
+      const totDev = conMonto.filter(a => a.estadoReembolso === 'PAGO_DEVUELTO').reduce((acc, a) => acc + (Number(a.montoDevuelto) || 0), 0);
+      const totPend = conMonto.filter(a => a.estadoReembolso !== 'PAGO_DEVUELTO').reduce((acc, a) => acc + (Number(a.montoDevuelto) || 0), 0);
+
+      if (badge) badge.textContent = `${lista.length}`;
+      if (devBadge) devBadge.textContent = `Devuelto: Bs. ${totDev.toFixed(2)}`;
+      if (pendBadge) pendBadge.textContent = `Pendiente: Bs. ${totPend.toFixed(2)}`;
+      tbody.innerHTML = '';
+
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay registros en patio para esta campaña.</td></tr>`;
+        return;
+      }
+
+      lista.forEach(a => {
+        const esAv = Boolean(a.esAveria || Number(a.montoDevuelto) > 0);
+        const esDev = a.estadoReembolso === 'PAGO_DEVUELTO';
+        const reembolsoHtml = esAv
+          ? `<strong class="text-slate-800">Bs. ${Number(a.montoDevuelto || 0).toFixed(2)}</strong>
+             <div class="text-[10px] text-slate-500">${a.metodoDevolucion || 'Efectivo'}</div>
+             <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold ${esDev ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esDev ? 'PAGO DEVUELTO' : 'PENDIENTE DEVOLUCIÓN'}</span>`
+          : `<span class="inline-block bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px]">RECIBIDA · PLANTA</span>`;
+
+        const accionesHtml = esAv
+          ? (esDev
+              ? `<button type="button" onclick="enviarWhatsAppDevolucion('${a.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[11px] font-semibold">WS</button>`
+              : `<button type="button" onclick="confirmarPagoDevuelto('${a.id}')" class="bg-blue-600 text-white px-2 py-1 rounded text-[11px] font-semibold">Marcar Devuelto</button>`)
+          : `<button type="button" onclick="eliminarAveriaLocal('${a.id}')" class="text-red-500 hover:text-red-700 text-xs">🗑️</button>`;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 border-b';
+        tr.innerHTML = `
+          <td class="p-2.5 font-mono"><strong>N° ${a.numeroBombona}</strong><br><span class="text-[11px] text-amber-700 font-semibold">${a.tamano}</span></td>
+          <td class="p-2.5"><span class="font-semibold">${a.nombre}</span><br><span class="text-[11px] text-slate-500">CI: ${a.cedula || '—'} · ${a.telefono || ''}</span></td>
+          <td class="p-2.5">${a.motivo || ''}${a.observacion ? `<br><span class="text-[11px] text-slate-500">${a.observacion}</span>` : ''}</td>
+          <td class="p-2.5">${reembolsoHtml}</td>
+          <td class="p-2.5 text-center">${accionesHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- PESTAÑA 5: ENTREGA PATIO ---
+    function actualizarSelectCampanasEntregas() {
+      const select = document.getElementById('entrega-campana-select');
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      if (!campanasGas.length) {
+        select.innerHTML = `<option value="2026-11-01">Operativo 1 - Noviembre 2026 (ACTIVA)</option>`;
+        return;
+      }
+      campanasGas.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.nombre} (${c.estado || 'ACTIVA'})`;
+        if (prev && String(opt.value) === String(prev)) opt.selected = true;
+        else if (!prev && c.estado === 'ACTIVA') opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function obtenerItemsAptosEntrega(campanaId) {
+      return averiasPatioGas
+        .filter(a => (!campanaId || !a.campanaId || String(a.campanaId).trim() === String(campanaId).trim()) && a.recibidaEnPatio !== false && !a.esAveria && !(Number(a.montoDevuelto) > 0))
+        .map(a => {
+          const reg = entregasPatioGas.find(e => String(e.idRecepcion) === String(a.id));
+          return {
+            ...a,
+            estadoEntrega: reg && reg.estadoEntrega === 'ENTREGADA' ? 'ENTREGADA' : 'PENDIENTE',
+            fechaEntrega: reg?.fechaEntrega || '',
+            entregadoPor: reg?.entregadoPor || '',
+            notaRetiro: reg?.notaRetiro || ''
+          };
+        });
+    }
+
+    async function marcarBombonaEntregada(idRecepcion) {
+      const campanaId = (document.getElementById('entrega-campana-select')?.value || '').trim();
+      const item = averiasPatioGas.find(a => String(a.id) === String(idRecepcion));
+      if (!item) return;
+
+      const nota = (document.getElementById('entrega-nota-retiro')?.value || '').trim() || 'Retiro en patio';
+      const usuario = localStorage.getItem('gas_usuario') || 'Jorge';
+      const rol = localStorage.getItem('gas_rol') || 'ADMIN';
+      const idEntrega = `ENT-${Date.now()}`;
+      const nuevo = {
+
+
+
+        id: idEntrega,
+        idRecepcion: String(item.id),
+        campanaId: item.campanaId || campanaId,
+        cedula: item.cedula || '',
+        nombre: item.nombre || '',
+        telefono: item.telefono || obtenerTelefonoVecino(item) || '',
+        numeroBombona: item.numeroBombona || 'S/N',
+        tamano: item.tamano || 'Gde (43kg)',
+        estadoEntrega: 'ENTREGADA',
+        notaRetiro: nota,
+        entregadoPor: `${usuario} (${rol})`,
+        fechaEntrega: new Date().toLocaleString('es-VE')
+};
+        window.ultimoDespachoEntrega = {
+        campanaId: nuevo.campanaId,
+        idRecepcion: nuevo.idRecepcion,
+        nota: nuevo.notaRetiro
+    };
+
+  const infoWs = document.getElementById('info-ws-ultimo-despacho');
+  if (infoWs) {
+    infoWs.textContent = `Última entrega: Bombona N° ${nuevo.numeroBombona} (${nuevo.tamano}) · ${nuevo.nombre} · Tel: ${nuevo.telefono || 'Sin tel'}`;
+  }
+
+
+
+      entregasPatioGas = [nuevo, ...entregasPatioGas.filter(e => String(e.idRecepcion) !== String(item.id))];
+      localStorage.setItem('entregasPatioGas', JSON.stringify(entregasPatioGas));
+      renderizarTablaEntregas();
+      renderizarResumenPdvsa();
+
+      if (sbClient) {
+        await sbClient.from('entregas_patio_gas').upsert({
+          id_entrega: nuevo.id,
+          id_recepcion: nuevo.idRecepcion,
+          campana_id: nuevo.campanaId,
+          cedula: nuevo.cedula,
+          vecino: nuevo.nombre,
+          telefono: nuevo.telefono,
+          serial_bombona: nuevo.numeroBombona,
+          tamano: nuevo.tamano,
+          estatus: 'ENTREGADA',
+          nota_retiro: nuevo.notaRetiro,
+          entregado_por: nuevo.entregadoPor
+        }, { onConflict: 'id_recepcion' });
+      }
+    }
+
+    async function revertirEntregaBombona(idRecepcion) {
+      if (!confirm("¿Regresar esta bombona a PENDIENTE?")) return;
+      entregasPatioGas = entregasPatioGas.filter(e => String(e.idRecepcion) !== String(idRecepcion));
+      localStorage.setItem('entregasPatioGas', JSON.stringify(entregasPatioGas));
+      renderizarTablaEntregas();
+      renderizarResumenPdvsa();
+      if (sbClient) {
+        await sbClient.from('entregas_patio_gas').delete().eq('id_recepcion', String(idRecepcion));
+      }
+    }
+
+    function enviarWhatsAppComprobanteEntrega(idRecepcion) {
+      const campanaId = (document.getElementById('entrega-campana-select')?.value || '').trim();
+      const items = obtenerItemsAptosEntrega(campanaId);
+      const item = items.find(a => String(a.id) === String(idRecepcion));
+      if (!item) return;
+
+      const campObj = campanasGas.find(c => String(c.id) === campanaId);
+      const nombreCamp = campObj?.nombre || campanaId;
+      const texto = [
+        "*Gas Vecinal Las Mercedes* (Sector 1, Calle 2, Quebrada de Lele)",
+        `Comprobante de Entrega · *${nombreCamp}*`,
+        `Vecino: *${item.nombre}*${item.cedula ? ` (CI: ${item.cedula})` : ''}`,
+        `Bombona: N° *${item.numeroBombona}* (${item.tamano}) → *${item.estadoEntrega}*`,
+        item.fechaEntrega ? `Fecha/Hora: ${item.fechaEntrega}` : ""
+      ].filter(Boolean).join('\n');
+
+      const tel = obtenerTelefonoVecino(item);
+      window.open(tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank', 'noopener,noreferrer');
+    }
+
+function normalizarTelefonoWs(telRaw) {
+  const d = String(telRaw || '').replace(/\D+/g, '');
+  if (!d) return '';
+  if (d.startsWith('58') && d.length >= 12) return d;
+  if (d.startsWith('0') && d.length === 11) return '58' + d.slice(1);
+  if (d.length === 10) return '58' + d;
+  return d;
+}
+
+function enviarComprobanteEntregaWs(destino = 'vecino') {
+  const ultimo = window.ultimoDespachoEntrega;
+  if (!ultimo) {
+    alert('Primero marca una bombona como entregada en 5. Entrega Patio.');
+    return;
+  }
+
+  const items = typeof obtenerItemsAptosEntrega === 'function'
+    ? obtenerItemsAptosEntrega(ultimo.campanaId)
+    : (typeof averiasPatioGas !== 'undefined' ? averiasPatioGas : []);
+
+  const item = items.find(a => String(a.id) === String(ultimo.idRecepcion))
+    || (typeof averiasPatioGas !== 'undefined' ? averiasPatioGas.find(a => String(a.id) === String(ultimo.idRecepcion)) : null);
+
+  if (!item) {
+    alert('No se encontraron los datos del despacho para armar el comprobante.');
+    return;
+  }
+
+  const campObj = typeof campanasGas !== 'undefined'
+    ? campanasGas.find(c => String(c.id) === String(ultimo.campanaId))
+    : null;
+  const nombreCamp = campObj?.nombre || ultimo.campanaId || 'Operativo';
+
+  const texto = [
+    '*Gas Vecinal Las Mercedes* _(Sector 1, Calle 2, Quebrada de Lele)_',
+    `Comprobante de Entrega · *${nombreCamp}*`,
+    `Vecino: *${item.nombre || ''}*${item.cedula ? ` (CI: ${item.cedula})` : ''}`,
+    `Bombona: *N° ${item.numeroBombona || 'S/N'}* (${item.tamano || ''}) → *ENTREGADA*`,
+    ultimo.nota ? `Observación: ${ultimo.nota}` : null,
+    item.fechaEntrega ? `Fecha/Hora: ${item.fechaEntrega}` : null
+  ].filter(Boolean).join('\n');
+
+  const telDestino = destino === 'respaldo'
+    ? '584124519810'
+    : normalizarTelefonoWs(
+        (typeof obtenerTelefonoVecino === 'function' ? obtenerTelefonoVecino(item) : '') || item.telefono || ''
+      );
+
+  if (!telDestino) {
+    alert('No hay un teléfono válido registrado para este vecino.');
+    return;
+  }
+
+  window.open(`https://wa.me/${telDestino}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener,noreferrer');
+}
+
+    function construirTextoAvisoLlegada() {
+      const campanaId = (document.getElementById('entrega-campana-select')?.value || '').trim();
+      const campObj = campanasGas.find(c => String(c.id) === campanaId);
+      const nombreCamp = campObj?.nombre || 'Jornada Actual';
+      const pendientes = obtenerItemsAptosEntrega(campanaId).filter(a => a.estadoEntrega !== 'ENTREGADA');
+      return [
+        "🔥 *GAS VECINAL LAS MERCEDES* 🔥",
+        "_(Sector 1, Calle 2, Quebrada de Lele)_",
+        `📢 *AVISO DE LLEGADA DE GAS — ${nombreCamp}*`,
+        "Vecinos, ya están llegando bombonas llenas de planta al patio. Acérquense a retirar las suyas.",
+        `📦 *Pendientes por retirar:* ${pendientes.length} cilindro(s).`
+      ].join('\n');
+    }
+
+    function enviarWhatsAppAvisoLlegada() {
+      window.open(`https://wa.me/?text=${encodeURIComponent(construirTextoAvisoLlegada())}`, '_blank', 'noopener,noreferrer');
+    }
+
+    function copiarAvisoLlegada() {
+      navigator.clipboard.writeText(construirTextoAvisoLlegada())
+        .then(() => alert("✅ Aviso copiado para WhatsApp."))
+        .catch(() => {});
+    }
+
+    function renderizarTablaEntregas() {
+      const tbody = document.getElementById('tabla-entregas-body');
+      const campanaId = (document.getElementById('entrega-campana-select')?.value || '').trim();
+      const filtroTexto = (document.getElementById('filtro-entregas')?.value || '').trim().toLowerCase();
+      const filtroEstado = (document.getElementById('filtro-estado-entrega')?.value || 'TODOS').trim();
+      if (!tbody) return;
+
+      const todos = obtenerItemsAptosEntrega(campanaId);
+      const entregadas = todos.filter(x => x.estadoEntrega === 'ENTREGADA').length;
+      document.getElementById('kpi-entrega-total').textContent = todos.length;
+      document.getElementById('kpi-entrega-pendientes').textContent = todos.length - entregadas;
+      document.getElementById('kpi-entrega-entregadas').textContent = entregadas;
+
+      let filtrados = todos;
+      if (filtroEstado !== 'TODOS') filtrados = filtrados.filter(x => x.estadoEntrega === filtroEstado);
+      if (filtroTexto) {
+        filtrados = filtrados.filter(x => [x.numeroBombona, x.tamano, x.cedula, x.nombre].some(v => String(v || '').toLowerCase().includes(filtroTexto)));
+      }
+
+      tbody.innerHTML = '';
+      if (!filtrados.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No hay bombonas aptas para este filtro.</td></tr>`;
+        return;
+      }
+
+      filtrados.forEach(item => {
+        const esEnt = item.estadoEntrega === 'ENTREGADA';
+        const tr = document.createElement('tr');
+        tr.className = esEnt ? 'bg-emerald-50/20 hover:bg-slate-50 border-b' : 'hover:bg-slate-50 border-b';
+        tr.innerHTML = `
+          <td class="p-2.5 font-mono"><strong>N° ${item.numeroBombona}</strong><br><span class="text-[11px] text-emerald-700 font-semibold">${item.tamano}</span></td>
+          <td class="p-2.5"><span class="font-bold text-slate-800">${item.nombre}</span> <span class="text-[11px] text-slate-500">· CI: ${item.cedula || '—'}</span></td>
+          <td class="p-2.5">${esEnt ? `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">ENTREGADA</span><div class="text-[10px] text-slate-500 mt-1">${item.fechaEntrega}</div>` : `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">PENDIENTE</span>`}</td>
+          <td class="p-2.5 text-center space-x-1">
+            ${esEnt
+              ? `<button type="button" onclick="enviarWhatsAppComprobanteEntrega('${item.id}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-[11px] font-semibold">WS Ticket</button>
+                 <button type="button" onclick="revertirEntregaBombona('${item.id}')" class="text-[10px] text-slate-500 underline">Deshacer</button>`
+              : `<button type="button" onclick="marcarBombonaEntregada('${item.id}')" class="bg-slate-900 hover:bg-emerald-700 text-white px-3 py-1 rounded text-[11px] font-bold">✓ Entregar</button>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- PESTAÑA 6: RESUMEN Y PDVSA ---
+    function actualizarSelectCampanasResumen() {
+      const select = document.getElementById('resumen-campana-select');
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      if (!campanasGas.length) {
+        select.innerHTML = `<option value="2026-11-01">Operativo 1 - Noviembre 2026 (ACTIVA)</option>`;
+        return;
+      }
+      campanasGas.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.nombre} (${c.estado || 'ACTIVA'})`;
+        if (prev && String(opt.value) === String(prev)) opt.selected = true;
+        else if (!prev && c.estado === 'ACTIVA') opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function clasificarTamanoResumen(t) {
+      const s = String(t || '').toLowerCase();
+      if (s.includes('10')) return '10kg';
+      if (s.includes('18')) return '18kg';
+      if (s.includes('43')) return '43kg';
+      return '43kg';
+    }
+
+    function obtenerNombreBancoEmisor(cod) {
+      const mapa = {
+        '0102': '0102 - Banco de Venezuela',
+        '0105': '0105 - Mercantil',
+        '0134': '0134 - Banesco',
+        '0108': '0108 - Provincial',
+        '0191': '0191 - BNC',
+        '0115': '0115 - Exterior',
+        'OTRO': 'Otro Banco'
+      };
+      return mapa[String(cod || '').toUpperCase()] || (cod || 'Sin banco');
+    }
+
+    function calcularMetricasCampana(campanaId) {
+      const pagosCamp = pagosRegistradosCampana.filter(p => !campanaId || !p.campanaId || String(p.campanaId).trim() === campanaId);
+      let totalRecaudado = 0, totalPM = 0, totalEf = 0, totalPropinas = 0, subtotalBombonasPagadas = 0, opsEfectivo = 0;
+      const porBancoPM = {};
+      const porTamano = {
+        '10kg': { label: 'Pequeña (10kg)', pagadas: 0, recibidas: 0, averias: 0, entregadas: 0, monto: 0 },
+        '18kg': { label: 'Mediana (18kg)', pagadas: 0, recibidas: 0, averias: 0, entregadas: 0, monto: 0 },
+        '43kg': { label: 'Grande (43kg)', pagadas: 0, recibidas: 0, averias: 0, entregadas: 0, monto: 0 }
+      };
+
+      pagosCamp.forEach(p => {
+        const montoTotal = Number(p.totalPagar ?? p.monto ?? 0) || 0;
+        const prop = Number(p.propina) || 0;
+        const pm = Number(p.pm) || 0;
+        const ef = Number(p.ef ?? (p.referencia ? 0 : montoTotal)) || 0;
+        const sub = Number(p.subtotalBombonas ?? Math.max(montoTotal - prop, 0)) || 0;
+        totalRecaudado += montoTotal;
+        totalPM += pm;
+        totalEf += ef;
+        if (ef > 0) opsEfectivo += 1;
+        if (pm > 0) {
+          const bCod = String(p.banco || 'OTRO').toUpperCase();
+          if (!porBancoPM[bCod]) porBancoPM[bCod] = { codigo: bCod, nombre: obtenerNombreBancoEmisor(bCod), ops: 0, monto: 0 };
+          porBancoPM[bCod].ops += 1;
+          porBancoPM[bCod].monto += pm;
+        }
+        totalPropinas += prop;
+        subtotalBombonasPagadas += sub;
+
+        (p.bombonas || []).forEach(b => {
+          const cat = clasificarTamanoResumen(b.tamano);
+          if (porTamano[cat]) {
+            porTamano[cat].pagadas += 1;
+            porTamano[cat].monto += Number(b.precio) || obtenerPrecioBombonaEnCampana(b.tamano) || 0;
+          }
+        });
+      });
+
+      const patioCamp = averiasPatioGas.filter(a => !campanaId || !a.campanaId || String(a.campanaId).trim() === campanaId);
+      let montoDevuelto = 0, montoPendienteDev = 0, cantidadAverias = 0;
+      patioCamp.forEach(a => {
+        const cat = clasificarTamanoResumen(a.tamano);
+        const esAv = Boolean(a.esAveria || Number(a.montoDevuelto) > 0);
+        if (porTamano[cat]) {
+          if (a.recibidaEnPatio !== false) porTamano[cat].recibidas += 1;
+          if (esAv) porTamano[cat].averias += 1;
+        }
+        if (esAv) {
+          cantidadAverias += 1;
+          const mDev = Number(a.montoDevuelto) || 0;
+          if (a.estadoReembolso === 'PAGO_DEVUELTO') montoDevuelto += mDev;
+          else montoPendienteDev += mDev;
+        }
+      });
+
+      const aptas = obtenerItemsAptosEntrega(campanaId);
+      aptas.forEach(item => {
+        if (item.estadoEntrega === 'ENTREGADA') {
+          const cat = clasificarTamanoResumen(item.tamano);
+          if (porTamano[cat]) porTamano[cat].entregadas += 1;
+        }
+      });
+
+      const totalEntregadas = aptas.filter(x => x.estadoEntrega === 'ENTREGADA').length;
+      const totalBombonasPagadas = Object.values(porTamano).reduce((acc, x) => acc + x.pagadas, 0);
+      const netoPdvsa = Math.max(subtotalBombonasPagadas - montoDevuelto, 0);
+      const netoPagarPdvsa = Math.max((totalEf + totalPM) - totalPropinas - montoDevuelto, 0);
+
+      return {
+        totalRecaudado, totalPM, totalEf, totalPropinas, subtotalBombonasPagadas,
+        netoPdvsa, netoPagarPdvsa, montoDevuelto, montoPendienteDev, cantidadAverias,
+        totalBombonasPagadas, totalAptasPatio: aptas.length, totalEntregadas,
+        opsEfectivo, porBancoPM, porTamano
+      };
+    }
+
+    function renderizarResumenPdvsa() {
+      const campanaId = (document.getElementById('resumen-campana-select')?.value || '').trim();
+      const m = calcularMetricasCampana(campanaId);
+      const setTxt = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+
+      setTxt('res-kpi-recaudado', `Bs. ${m.totalRecaudado.toFixed(2)}`);
+      setTxt('res-kpi-pm-ef', `PM: Bs. ${m.totalPM.toFixed(2)} · Ef: Bs. ${m.totalEf.toFixed(2)}`);
+      setTxt('res-kpi-pdvsa', `Bs. ${m.netoPdvsa.toFixed(2)}`);
+      setTxt('res-kpi-propinas', `Bs. ${m.totalPropinas.toFixed(2)}`);
+      setTxt('res-kpi-averias-monto', `Bs. ${(m.montoDevuelto + m.montoPendienteDev).toFixed(2)}`);
+      setTxt('res-kpi-averias-detalle', `Dev: Bs. ${m.montoDevuelto.toFixed(2)} · Pend: Bs. ${m.montoPendienteDev.toFixed(2)}`);
+      setTxt('res-kpi-patio', `${m.totalEntregadas} / ${m.totalAptasPatio}`);
+      setTxt('res-kpi-patio-sub', `Pagadas en campaña: ${m.totalBombonasPagadas} cil.`);
+
+      const filas = Object.values(m.porTamano);
+      document.getElementById('tabla-resumen-tamanos-body').innerHTML = filas.map(f => `
+        <tr class="hover:bg-slate-50 border-b">
+          <td class="p-2.5 font-semibold">${f.label}</td>
+          <td class="p-2.5 text-center font-bold">${f.pagadas}</td>
+          <td class="p-2.5 text-center text-emerald-700 font-semibold">${f.recibidas}</td>
+          <td class="p-2.5 text-center text-red-600 font-semibold">${f.averias}</td>
+          <td class="p-2.5 text-center text-blue-700 font-semibold">${f.entregadas}</td>
+          <td class="p-2.5 text-right font-mono font-bold">Bs. ${f.monto.toFixed(2)}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('detalle-cuadre-pdvsa').innerHTML = `
+        <div class="flex justify-between py-1.5 border-b"><span>Subtotal bombonas pagadas:</span><strong>Bs. ${m.subtotalBombonasPagadas.toFixed(2)}</strong></div>
+        <div class="flex justify-between py-1.5 border-b text-red-700"><span>Averías devueltas:</span><strong>- Bs. ${m.montoDevuelto.toFixed(2)}</strong></div>
+        <div class="flex justify-between py-1.5 border-b text-emerald-800 bg-emerald-50/60 px-2 rounded"><span>Neto estimado PDVSA:</span><strong>Bs. ${m.netoPdvsa.toFixed(2)}</strong></div>
+        <div class="flex justify-between py-1.5"><span>Total propinas:</span><strong>Bs. ${m.totalPropinas.toFixed(2)}</strong></div>
+      `;
+
+      setTxt('res-detalle-efectivo-monto', `Bs. ${m.totalEf.toFixed(2)}`);
+      setTxt('res-detalle-efectivo-ops', `${m.opsEfectivo} operación(es) con efectivo`);
+      setTxt('res-badge-metodos-total', `Total Métodos: Bs. ${(m.totalPM + m.totalEf).toFixed(2)}`);
+
+      const bancosLista = Object.values(m.porBancoPM).sort((a, b) => b.monto - a.monto);
+      document.getElementById('tabla-resumen-bancos-body').innerHTML = bancosLista.length
+        ? bancosLista.map(b => {
+            const pct = m.totalPM > 0 ? ((b.monto / m.totalPM) * 100).toFixed(1) : '0.0';
+            return `<tr class="hover:bg-slate-50 border-b"><td class="p-2.5 font-semibold">${b.nombre}</td><td class="p-2.5 text-center">${b.ops}</td><td class="p-2.5 text-right font-mono font-bold text-emerald-700">Bs. ${b.monto.toFixed(2)}</td><td class="p-2.5 text-right">${pct}%</td></tr>`;
+          }).join('')
+        : `<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay cobros por Pago Móvil en esta campaña.</td></tr>`;
+
+      setTxt('res-cuadre-efectivo', `Bs. ${m.totalEf.toFixed(2)}`);
+      setTxt('res-cuadre-bancos', `Bs. ${m.totalPM.toFixed(2)}`);
+      setTxt('res-cuadre-propinas', `Bs. ${m.totalPropinas.toFixed(2)}`);
+      setTxt('res-cuadre-devueltas', `- Bs. ${m.montoDevuelto.toFixed(2)}`);
+      setTxt('res-cuadre-neto-pdvsa', `Bs. ${m.netoPagarPdvsa.toFixed(2)}`);
+      setTxt('res-cuadre-formula-texto', `Cuadre: Ef. Bs. ${m.totalEf.toFixed(2)} + Bancos Bs. ${m.totalPM.toFixed(2)} − Propinas Bs. ${m.totalPropinas.toFixed(2)} − Devueltas Bs. ${m.montoDevuelto.toFixed(2)} = Bs. ${m.netoPagarPdvsa.toFixed(2)}`);
+    }
+
+    function construirTextoResumenPdvsa() {
+      const campanaId = (document.getElementById('resumen-campana-select')?.value || '').trim();
+      const campObj = campanasGas.find(c => String(c.id) === campanaId);
+      const m = calcularMetricasCampana(campanaId);
+      return [
+        "📊 *RESUMEN OPERATIVO — GAS VECINAL LAS MERCEDES*",
+        "_(Sector 1, Calle 2, Quebrada de Lele)_",
+        `Campaña: *${campObj?.nombre || campanaId}*`,
+        `• *Total Recaudado:* Bs. *${m.totalRecaudado.toFixed(2)}* (PM: ${m.totalPM.toFixed(2)} | Ef: ${m.totalEf.toFixed(2)})`,
+        `• *A Pagar / Rendir PDVSA:* Bs. *${m.netoPagarPdvsa.toFixed(2)}*`,
+        `• *Propinas:* Bs. *${m.totalPropinas.toFixed(2)}*`,
+        `• *Entregas en Patio:* *${m.totalEntregadas}* / *${m.totalAptasPatio}* aptas`
+      ].join('\n');
+    }
+
+    function copiarResumenPdvsa() {
+      navigator.clipboard.writeText(construirTextoResumenPdvsa())
+        .then(() => alert("✅ Resumen copiado."))
+        .catch(() => {});
+    }
+
+    function enviarResumenPdvsaWhatsApp() {
+      window.open(`https://wa.me/?text=${encodeURIComponent(construirTextoResumenPdvsa())}`, '_blank', 'noopener,noreferrer');
+    }
+  </script>
+
+  <footer class="max-w-7xl mx-auto px-4 mt-8 text-center text-xs text-slate-500">
+    <p>Gas Vecinal Las Mercedes • Sector 1 Calle 2 Quebrada de Lele</p>
+    <p class="mt-0.5 font-medium text-slate-600">Aporte del vecino Jorge von der Brelje</p>
+  </footer>
+</body>
+</html>
