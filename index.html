@@ -26,15 +26,17 @@
         </span>
         <div id="badge-rol" class="bg-emerald-800 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2">
           <i class="fa-solid fa-user-shield text-amber-300"></i>
-          <span id="badge-rol-texto">Modo: ADMIN (Jorge)</span>
+          <span id="badge-rol-texto">Modo: VECINO (Vecino)</span>
         </div>
         <button type="button" onclick="sincronizarTodoSupabase()" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-1.5 rounded-lg font-medium transition">
           <i class="fa-solid fa-arrows-rotate mr-1"></i> Sincronizar
         </button>
+        <button id="btn-cambiar-clave-rol" type="button" onclick="abrirModalCambiarClave()" class="hidden bg-amber-600 hover:bg-amber-500 text-xs px-3 py-1.5 rounded-lg font-medium transition">
+          <i class="fa-solid fa-lock mr-1"></i> Cambiar Clave
+        </button>
         <button type="button" onclick="abrirModalRol()" class="bg-slate-900 hover:bg-slate-800 text-xs px-3 py-1.5 rounded-lg font-medium transition">
           <i class="fa-solid fa-key mr-1"></i> Cambiar Rol / Clave
         </button>
-      </div>
     </div>
   </header>
 
@@ -45,7 +47,7 @@
         <i class="fa-solid fa-users"></i> 1. Registro
       </button>
       <button type="button" onclick="cambiarPestaña(2)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
-        <i class="fa-solid fa-calendar-days"></i> 2. Campaña Anual & Estado
+        <i class="fa-solid fa-calendar-days"></i> 2. Operativo & Estado
       </button>
       <button type="button" onclick="cambiarPestaña(3)" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-2 whitespace-nowrap">
         <i class="fa-solid fa-file-invoice-dollar"></i> 3. Pagos & Propinas
@@ -151,13 +153,13 @@
       </div>
     </section>
 
-    <!-- PESTAÑA 2: CAMPAÑA & ESTADO -->
+    <!-- PESTAÑA 2: OPERATIVO & ESTADO -->
     <section id="seccion-2" class="seccion-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
       <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
         <div class="flex justify-between items-center mb-4 pb-2 border-b">
           <h2 class="text-sm font-bold text-slate-700 uppercase flex items-center gap-2">
             <span class="bg-amber-100 text-amber-600 p-1.5 rounded-lg"><i class="fa-solid fa-bullhorn"></i></span>
-            Registrar / Editar Campaña de Gas
+            Registrar / Editar Operativo de Gas
           </h2>
           <button type="button" onclick="prepararNuevaCampana()" class="text-xs text-slate-500 hover:underline font-semibold">Generar Sugerencia</button>
         </div>
@@ -177,23 +179,23 @@
 
           <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
             <h3 class="text-xs font-bold text-amber-800 uppercase mb-3">Precios Oficiales de la Jornada (PDVSA)</h3>
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pequeña (10kg)</label>
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+              <div class="flex flex-col justify-between">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1 leading-tight">Pequeña (10kg)</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
                   <input type="number" step="0.01" id="camp-precio-10" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
               </div>
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Mediana (18kg)</label>
+              <div class="flex flex-col justify-between">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1 leading-tight">Mediana (18kg)</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
                   <input type="number" step="0.01" id="camp-precio-18" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
               </div>
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Grande (43kg)</label>
+             <div class="flex flex-col justify-between">
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1 leading-tight">Grande (43kg)</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-2 text-xs text-slate-400 font-bold">Bs</span>
                   <input type="number" step="0.01" id="camp-precio-43" placeholder="0.00" class="w-full pl-7 pr-2 py-1.5 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none">
@@ -203,14 +205,14 @@
           </div>
 
           <button type="button" onclick="guardarCampana()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg shadow-sm transition text-sm flex items-center justify-center gap-2">
-            <i class="fa-solid fa-circle-plus"></i> Guardar Campaña / Jornada
+            <i class="fa-solid fa-circle-plus"></i> Guardar Operativo / Jornada
           </button>
         </div>
       </div>
 
       <div class="lg:col-span-7 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-4 pb-2 border-b">
-          <h2 class="text-sm font-bold text-slate-700 uppercase">Historial de Campañas Registradas</h2>
+          <h2 class="text-sm font-bold text-slate-700 uppercase">Historial de Operativos Registrados</h2>
           <span class="text-xs text-slate-400">Control de estado y precios</span>
         </div>
         <div id="contenedor-historial-campanas" class="space-y-4 max-h-[550px] overflow-y-auto pr-1"></div>
@@ -227,10 +229,10 @@
           <button type="button" onclick="limpiarFormularioPago()" class="text-xs text-emerald-700 hover:underline font-semibold">Limpiar</button>
         </div>
 
-        <<form id="formPagos" onsubmit="enviarPagoVecinal(event)" class="space-y-4">
+        <form id="formPagos" onsubmit="enviarPagoVecinal(event)" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Operativo</label>
               <select id="pago-campana-select" onchange="refrescarPreciosCarritoYSeleccion(); renderizarTablaPagos();" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none" required></select>
             </div>
             <div>
@@ -406,7 +408,7 @@
 
         <form id="formAverias" onsubmit="registrarRecepcionPatio(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Operativo</label>
             <select id="averia-campana-select" onchange="buscarVecinoParaAveria(document.getElementById('averia-cedula').value, true); renderizarTablaAverias();" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-amber-500 outline-none" required></select>
           </div>
 
@@ -433,7 +435,7 @@
 
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-700 uppercase">Bombonas Pagadas en Campaña</span>
+              <span class="text-xs font-bold text-slate-700 uppercase">Bombonas Pagadas en Operativo/span>
               <span id="contador-bombonas-pagadas-vecino" class="text-[11px] font-semibold text-emerald-700">0 bombonas</span>
             </div>
             <div id="lista-bombonas-pagadas-vecino" class="space-y-2">
@@ -549,7 +551,7 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campaña / Operativo</label>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Operativo</label>
           <select id="entrega-campana-select" onchange="renderizarTablaEntregas()" class="w-full p-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none"></select>
         </div>
 
@@ -730,7 +732,7 @@
             <h3 class="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
               <i class="fa-solid fa-building-columns text-emerald-600"></i> Detalle de Recaudación: Efectivo y Pago Móvil por Banco Emisor
             </h3>
-            <p class="text-[11px] text-slate-500">Agrupación de cobros de la campaña seleccionada por método de pago y banco emisor</p>
+            <p class="text-[11px] text-slate-500">Agrupación de cobros de la operativo seleccionada por método de pago y banco emisor</p>
           </div>
           <span id="res-badge-metodos-total" class="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded-full font-bold">
             Total Métodos: Bs. 0.00
@@ -819,6 +821,46 @@
     </div>
   </div>
 
+<!-- MODAL DE CAMBIO DE CLAVE (SOLO ADMIN / OPERADOR) -->
+  <div id="modalCambiarClave" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl space-y-3">
+      <h3 class="text-lg font-bold text-gray-800">Cambiar Clave de Acceso</h3>
+      <p class="text-xs text-slate-500">Disponible solo para sesión activa de ADMIN u OPERADOR.</p>
+      <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        La clave nueva debe ser <strong>numérica de 6 dígitos</strong> y <strong>distinta a su cédula</strong>.
+      </p>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Cédula</label>
+        <input type="text" id="cc-cedula" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Ej. 8686731">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nombre y Apellido</label>
+        <input type="text" id="cc-nombre" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Ej. Jorge von der Brelje">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Clave Actual</label>
+        <input type="password" id="cc-actual" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Clave actual">
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Clave Nueva (6 dígitos)</label>
+          <input type="password" id="cc-nueva" maxlength="6" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="******">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Confirmar Clave</label>
+          <input type="password" id="cc-confirmar" maxlength="6" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="******">
+        </div>
+      </div>
+
+      <div id="cc-error" class="text-red-600 text-xs font-semibold hidden"></div>
+
+      <div class="flex justify-end gap-2 pt-3">
+        <button type="button" onclick="cerrarModalCambiarClave()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-xs font-semibold">Cancelar</button>
+        <button type="button" onclick="guardarNuevaClaveRol()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-xs font-semibold">Guardar Clave</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://xpnpxmyjmmcdebglkatz.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_xipnuf5SS19IcG30rh7RCg_B2fQ509g";
@@ -848,8 +890,8 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
       if (!localStorage.getItem("gas_rol")) {
-        localStorage.setItem("gas_rol", "ADMIN");
-        localStorage.setItem("gas_usuario", "Jorge");
+        localStorage.setItem("gas_rol", "VECINO");
+        localStorage.setItem("gas_usuario", "Vecino");
       }
       aplicarPermisosRol();
       agregarFilaBombona('Gde (43kg)', '');
@@ -1147,9 +1189,9 @@
 
     // --- NAVEGACIÓN Y ROL ---
     function cambiarPestaña(num) {
-      const rol = localStorage.getItem("gas_rol") || "ADMIN";
-      if (rol === "USUARIO" && ![1, 3, 4].includes(num)) {
-        alert("Acceso restringido. Su rol actual solo permite ver las pestañas 1, 3 y 4.");
+      const rol = localStorage.getItem("gas_rol") || "VECINO";
+      if (rol === "VECINO" && ![1, 3].includes(num)) {
+        alert("Acceso restringido. Su rol actual solo permite ver las pestañas 1 y 3.");
         return;
       }
       if (rol === "OPERADOR" && ![1, 3, 4, 5].includes(num)) {
@@ -1187,37 +1229,35 @@
       const clave = document.getElementById("inputClaveLogin").value.trim();
       const errorDiv = document.getElementById("errorLogin");
       if (!usuario || !clave) {
-        errorDiv.textContent = "Por favor ingrese usuario y clave.";
+        errorDiv.textContent = "Por favor ingrese usuario/cédula y clave.";
         errorDiv.classList.remove("hidden");
         return;
       }
 
-      if (sbClient) {
-        const { data } = await sbClient
-          .from('usuarios_gas')
-          .select('*')
-          .eq('usuario_cedula', usuario)
-          .eq('clave_acceso', clave)
-          .eq('activo', true)
-          .maybeSingle();
-        if (data) {
-          localStorage.setItem("gas_rol", String(data.rol || "OPERADOR").toUpperCase());
-          localStorage.setItem("gas_usuario", data.nombre || usuario);
-          cerrarModalRol();
-          aplicarPermisosRol();
-          renderizarCampanas();
-          alert(`¡Bienvenido, ${data.nombre}! Rol: ${data.rol}`);
-          return;
-        }
+      if (!sbClient) {
+        errorDiv.textContent = "No hay conexión activa con Supabase para validar credenciales.";
+        errorDiv.classList.remove("hidden");
+        return;
       }
 
-      if (usuario === "8686731" && clave === "1091") {
-        localStorage.setItem("gas_rol", "ADMIN");
-        localStorage.setItem("gas_usuario", "Jorge");
+      const { data, error } = await sbClient
+        .from('usuarios_gas')
+        .select('*')
+        .eq('usuario_cedula', usuario)
+        .eq('clave_acceso', clave)
+        .eq('activo', true)
+        .maybeSingle();
+
+      if (!error && data) {
+        const rolValidado = String(data.rol || "OPERADOR").toUpperCase();
+        const nombreValidado = data.nombre || usuario;
+        localStorage.setItem("gas_rol", rolValidado);
+        localStorage.setItem("gas_usuario", nombreValidado);
+        localStorage.setItem("gas_cedula", String(data.usuario_cedula || usuario));
         cerrarModalRol();
         aplicarPermisosRol();
         renderizarCampanas();
-        alert("¡Bienvenido, Jorge! Rol asignado: ADMIN");
+        alert(`¡Bienvenido, ${nombreValidado}! Rol: ${rolValidado}`);
         return;
       }
 
@@ -1226,10 +1266,15 @@
     }
 
     function aplicarPermisosRol() {
-      const rol = localStorage.getItem("gas_rol") || "ADMIN";
-      const nombre = localStorage.getItem("gas_usuario") || "Jorge";
+      const rol = localStorage.getItem("gas_rol") || "VECINO";
+      const nombre = localStorage.getItem("gas_usuario") || "Vecino";
       const badgeTexto = document.getElementById("badge-rol-texto");
       if (badgeTexto) badgeTexto.textContent = `Modo: ${rol} (${nombre})`;
+
+      const btnCambiarClave = document.getElementById("btn-cambiar-clave-rol");
+      if (btnCambiarClave) {
+        btnCambiarClave.classList.toggle("hidden", !["ADMIN", "OPERADOR"].includes(rol));
+      }
 
       const tabs = document.querySelectorAll(".tab-btn");
       tabs.forEach((tab, index) => {
@@ -1239,9 +1284,96 @@
         } else if (rol === "OPERADOR") {
           tab.style.display = [1, 3, 4, 5].includes(numTab) ? "flex" : "none";
         } else {
-          tab.style.display = [1, 3, 4].includes(numTab) ? "flex" : "none";
+          tab.style.display = [1, 3].includes(numTab) ? "flex" : "none";
         }
       });
+    }
+
+    function abrirModalCambiarClave() {
+      const rolActual = localStorage.getItem("gas_rol") || "VECINO";
+      if (!["ADMIN", "OPERADOR"].includes(rolActual)) {
+        alert("Solo usuarios con rol ADMIN u OPERADOR pueden cambiar clave.");
+        return;
+      }
+      const err = document.getElementById("cc-error");
+      if (err) {
+        err.textContent = "";
+        err.classList.add("hidden");
+      }
+      document.getElementById("cc-cedula").value = localStorage.getItem("gas_cedula") || "";
+      document.getElementById("cc-nombre").value = localStorage.getItem("gas_usuario") || "";
+      document.getElementById("cc-actual").value = "";
+      document.getElementById("cc-nueva").value = "";
+      document.getElementById("cc-confirmar").value = "";
+      document.getElementById("modalCambiarClave").classList.remove("hidden");
+    }
+
+    function cerrarModalCambiarClave() {
+      document.getElementById("modalCambiarClave").classList.add("hidden");
+    }
+
+    async function guardarNuevaClaveRol() {
+      const rolActual = localStorage.getItem("gas_rol") || "VECINO";
+      const err = document.getElementById("cc-error");
+      const mostrarError = (msg) => {
+        err.textContent = msg;
+        err.classList.remove("hidden");
+      };
+
+      if (!["ADMIN", "OPERADOR"].includes(rolActual)) {
+        return mostrarError("Acceso denegado: requiere sesión de ADMIN u OPERADOR.");
+      }
+
+      const cedula = document.getElementById("cc-cedula").value.trim();
+      const nombre = document.getElementById("cc-nombre").value.trim();
+      const claveActual = document.getElementById("cc-actual").value.trim();
+      const claveNueva = document.getElementById("cc-nueva").value.trim();
+      const confirmar = document.getElementById("cc-confirmar").value.trim();
+
+      if (!cedula || !nombre || !claveActual || !claveNueva || !confirmar) {
+        return mostrarError("Complete cédula, nombre, clave actual y clave nueva.");
+      }
+      if (!/^\d{6}$/.test(claveNueva)) {
+        return mostrarError("La clave nueva debe tener exactamente 6 dígitos numéricos.");
+      }
+      if (claveNueva === cedula) {
+        return mostrarError("La clave nueva no puede ser igual a la cédula.");
+      }
+      if (claveNueva !== confirmar) {
+        return mostrarError("La confirmación no coincide con la clave nueva.");
+      }
+      if (!sbClient) {
+        return mostrarError("No hay conexión activa con Supabase.");
+      }
+
+      const { data: usuarioDb, error: errConsulta } = await sbClient
+        .from('usuarios_gas')
+        .select('usuario_cedula, nombre, clave_acceso, rol, activo')
+        .eq('usuario_cedula', cedula)
+        .eq('activo', true)
+        .maybeSingle();
+
+      if (errConsulta || !usuarioDb) {
+        return mostrarError("No se encontró el usuario activo en Supabase.");
+      }
+      if (String(usuarioDb.clave_acceso || '').trim() !== claveActual) {
+        return mostrarError("La clave actual es incorrecta.");
+      }
+
+      const { error: errUpdate } = await sbClient
+        .from('usuarios_gas')
+        .update({ clave_acceso: claveNueva, nombre: nombre })
+        .eq('usuario_cedula', cedula);
+
+      if (errUpdate) {
+        return mostrarError("No se pudo actualizar la clave en Supabase.");
+      }
+
+      localStorage.setItem("gas_usuario", nombre);
+      localStorage.setItem("gas_cedula", cedula);
+      aplicarPermisosRol();
+      cerrarModalCambiarClave();
+      alert("Clave actualizada correctamente en Supabase.");
     }
 
     // --- PESTAÑA 1: REGISTRO ---
@@ -1331,19 +1463,20 @@
 
       localStorage.setItem('registrosGas', JSON.stringify(registrosGas));
       renderizarTabla();
-
+      let sincronizadoSB = false;
       if (sbClient) {
     try {
       const { error: errVecino } = await sbClient
         .from('vecinos_gas')
         .upsert(
-          {
-            cedula,
-            nombre_apellido: nombre,
-            telefono,
-            tipo_registro: tipo,
-            actualizado_por: localStorage.getItem('gas_usuario') || 'Jorge'
-          },
+        {
+          cedula,
+          nombre_apellido: nombre,
+          telefono,
+          tipo_registro: tipo,
+          bombona_tamano: bombonasDetalle[0]?.tamano || 'Peq (10kg)',
+          actualizado_por: localStorage.getItem('gas_usuario') || 'Jorge'
+        },
           { onConflict: 'cedula' }
         );
       if (errVecino) throw errVecino;
@@ -1363,11 +1496,12 @@
       if (filasCilindros.length > 0) {
         const { error: errInsCil } = await sbClient
           .from('cilindros_vecinos_gas')
-          .insert(filasCilindros);
+          . insert(filasCilindros);
         if (errInsCil) throw errInsCil;
       }
 
       setEstadoSync("• Sincronizado Supabase", true);
+      sincronizadoSB = true;
     } catch (e) {
       console.error("Error guardando vecino/cilindros en Supabase:", e);
       setEstadoSync("! Guardado local (revisar SB)", false);
@@ -1375,7 +1509,11 @@
   }
 
       limpiarFormulario();
-      alert("¡Registro guardado y sincronizado!");
+         if (sincronizadoSB) {
+            alert("¡Registro guardado y sincronizado!");
+          } else {
+          alert("Guardado localmente. Revisa el estado de sincronización con Supabase.");
+        }
     }
 
     function limpiarFormulario() {
@@ -1437,9 +1575,9 @@
       });
     }
 
-    // --- PESTAÑA 2: CAMPAÑAS ---
+    // --- PESTAÑA 2: OPERATIVOS ---
     function prepararNuevaCampana() {
-      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      const rol = localStorage.getItem("gas_rol") || "VECINO";
       if (rol !== "ADMIN") return;
       const hoy = new Date();
       const fechaIso = hoy.toISOString().split('T')[0];
@@ -1461,7 +1599,7 @@
     async function guardarCampana() {
       const rol = localStorage.getItem("gas_rol") || "ADMIN";
       if (rol !== "ADMIN") {
-        alert("Solo los administradores pueden crear o editar campañas.");
+        alert("Solo los administradores pueden crear o editar OPERATIVOS.");
         return;
       }
 
@@ -1480,7 +1618,7 @@
       const esEdicionExistente = campanasGas.some(c => String(c.id) === String(idInput));
       const campanaAbierta = campanasGas.find(c => (c.estado || c.ESTADO) === "ACTIVA");
       if (!esEdicionExistente && campanaAbierta) {
-        alert(`⚠️ Ya existe una campaña abierta: "${campanaAbierta.nombre}". Culmínala antes de crear otra.`);
+        alert(`⚠️ Ya existe una operativo abierto: "${campanaAbierta.nombre}". Culmínala antes de crear otra.`);
         return;
       }
 
@@ -1520,13 +1658,13 @@
         }, { onConflict: 'id_campana' });
 
         if (error) {
-          alert("⚠️ Error en Supabase al guardar campaña: " + error.message);
+          alert("⚠️ Error en Supabase al guardar operativo: " + error.message);
           return;
         }
       }
 
       prepararNuevaCampana();
-      alert("¡Campaña guardada en Supabase!");
+      alert("¡Operativo guardado en Base de Datos!");
     }
 
     function editarCampana(id) {
@@ -1542,9 +1680,9 @@
     }
 
     async function culminarCampana(id) {
-      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      const rol = localStorage.getItem("gas_rol") || "VECINO";
       if (rol !== "ADMIN") {
-        alert("Solo un Administrador puede culminar una campaña.");
+        alert("Solo un Administrador puede culminar una operativo.");
         return;
       }
       const camp = campanasGas.find(c => String(c.id) === String(id));
@@ -1552,11 +1690,11 @@
 
       const pendientesEntrega = obtenerItemsAptosEntrega(id).filter(x => x.estadoEntrega !== 'ENTREGADA');
       if (pendientesEntrega.length > 0) {
-        alert(`⛔ Aún faltan ${pendientesEntrega.length} bombona(s) por entregar en patio en esta campaña.`);
+        alert(`⛔ Aún faltan ${pendientesEntrega.length} bombona(s) por entregar en patio en este operativo.`);
         return;
       }
 
-      if (!confirm(`¿Culminar la campaña "${camp.nombre}" y abrir el mensaje de cierre por WhatsApp?`)) return;
+      if (!confirm(`¿Culminar el operativo "${camp.nombre}" y abrir el mensaje de cierre por WhatsApp?`)) return;
 
       camp.estado = "CULMINADA";
       localStorage.setItem("campanasGas", JSON.stringify(campanasGas));
@@ -1582,11 +1720,11 @@
 
     function renderizarCampanas() {
       const contenedor = document.getElementById("contenedor-historial-campanas");
-      const rol = localStorage.getItem("gas_rol") || "ADMIN";
+      const rol = localStorage.getItem("gas_rol") || "VECINO";
       if (!contenedor) return;
       contenedor.innerHTML = "";
       if (campanasGas.length === 0) {
-        contenedor.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs border border-dashed rounded-xl">No hay campañas registradas aún.</div>`;
+        contenedor.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs border border-dashed rounded-xl">No hay operativos registrados aún.</div>`;
         return;
       }
       campanasGas.forEach(c => {
@@ -1701,7 +1839,7 @@
       const op = selectBombona.options[selectBombona.selectedIndex];
       const tamano = op?.dataset?.tamanoBombona || "";
       const precio = obtenerPrecioBombonaEnCampana(tamano);
-      avisoEl.textContent = `Precio en campaña (${tamano}): Bs. ${precio.toFixed(2)} — Pulsa "+ Adicionar".`;
+      avisoEl.textContent = `Precio en operativo (${tamano}): Bs. ${precio.toFixed(2)} — Pulsa "+ Adicionar".`;
     }
 
     function refrescarPreciosCarritoYSeleccion() {
@@ -1738,7 +1876,7 @@
           p.bombonas.some(b => String(b.numero || '').trim().toUpperCase() === numero)
         );
         if (yaPagada) {
-          alert(`⚠️ La bombona N° ${numero} ya fue registrada como pagada en esta campaña.`);
+          alert(`⚠️ La bombona N° ${numero} ya fue registrada como pagada en este operativo.`);
           return;
         }
       }
@@ -1873,106 +2011,158 @@
     }
 
     async function enviarPagoVecinal(event) {
-       event.preventDefault();
-        const btnSubmit = document.getElementById('btn-submit-pago');
-         const textoOriginal = btnSubmit ? btnSubmit.textContent : 'Registrar Pago y Validar';
+      event.preventDefault();
+      const btnSubmit = document.getElementById('btn-submit-pago');
+      const textoOriginal = btnSubmit ? btnSubmit.textContent : 'Registrar Pago y Validar';
 
-        if (!confirmarDesglosePagoMixto()) {
-        return;
-  }
-
-  if (btnSubmit) {
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = "Validando y guardando...";
-  }
-
-  try {
-    const campanaId = (document.getElementById('pago-campana-select')?.value || '').trim();
-    const cedula = (document.getElementById('pago-cedula')?.value || '').trim();
-    const nombre = (document.getElementById('pago-nombre')?.value || '').trim();
-    const propina = Math.max(leerNumeroInput('pago-propina'), 0);
-    const pm = Math.max(leerNumeroInput('pago-monto-pm'), 0);
-    const ef = Math.max(leerNumeroInput('pago-monto-ef'), 0);
-    const banco = (document.getElementById('pago-banco')?.value || '').trim();
-    const referencia = (document.getElementById('pago-referencia')?.value || '').trim();
-    const terceroNombre = (document.getElementById('tercero-nombre')?.value || '').trim();
-    const terceroCedula = (document.getElementById('tercero-cedula')?.value || '').trim();
-    const subtotalBombones = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
-    const totalPagar = Number((subtotalBombones + propina).toFixed(2));
-
-    if (!cedula || !bombonasSeleccionadasPago.length) {
-      alert("Verifica la cédula y agrega al menos una bombona antes de registrar.");
-      return;
-    }
-
-    const bancoLimpio = banco.toUpperCase();
-    const refLimpia = referencia.toUpperCase();
-
-    if (pm > 0) {
-      if (!bancoLimpio) {
-        alert("Selecciona el Banco Emisor para el Pago Móvil antes de registrar.");
-        return;
-      }
-      if (!refLimpia) {
-        alert("Indica el N° de Referencia del Pago Móvil antes de registrar.");
+      if (!confirmarDesglosePagoMixto()) {
         return;
       }
 
-      const duplicado = Array.isArray(pagosRegistradosCampana) && pagosRegistradosCampana.some(p =>
-        String(p.referencia || '').trim().toUpperCase() === refLimpia &&
-        String(p.banco || '').trim().toUpperCase() === bancoLimpio &&
-        (!campanaId || String(p.campanaId || '').trim() === campanaId)
-      );
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = "Validando y guardando...";
+      }
 
-      if (duplicado) {
-        alert(`Ya existe un pago registrado con la referencia "${referencia}" en el banco "${banco}" en esta campaña.`);
-        return;
+      try {
+        const campanaId = (document.getElementById('pago-campana-select')?.value || '').trim();
+        const cedula = (document.getElementById('pago-cedula')?.value || '').trim();
+        const nombre = (document.getElementById('pago-nombre')?.value || '').trim();
+        const propina = Math.max(leerNumeroInput('pago-propina'), 0);
+        const pm = Math.max(leerNumeroInput('pago-monto-pm'), 0);
+        const ef = Math.max(leerNumeroInput('pago-monto-ef'), 0);
+        const banco = (document.getElementById('pago-banco')?.value || '').trim();
+        const referencia = (document.getElementById('pago-referencia')?.value || '').trim();
+        const terceroNombre = (document.getElementById('tercero-nombre')?.value || '').trim();
+        const terceroCedula = (document.getElementById('tercero-cedula')?.value || '').trim();
+        const archivoCapture = document.getElementById('pago-capture')?.files?.[0] || null;
+        const subtotalBombones = bombonasSeleccionadasPago.reduce((acc, b) => acc + (Number(b.precio) || 0), 0);
+        const totalPagar = Number((subtotalBombones + propina).toFixed(2));
+
+        if (!cedula || !bombonasSeleccionadasPago.length) {
+          alert("Verifica la cédula y agrega al menos una bombona antes de registrar.");
+          return;
+        }
+
+        const bancoLimpio = banco.toUpperCase();
+        const refLimpia = referencia.toUpperCase();
+
+        if (pm > 0) {
+          if (!bancoLimpio) {
+            alert("Selecciona el Banco Emisor para el Pago Móvil antes de registrar.");
+            return;
+          }
+          if (!refLimpia) {
+            alert("Indica el N° de Referencia del Pago Móvil antes de registrar.");
+            return;
+          }
+
+          const duplicado = Array.isArray(pagosRegistradosCampana) && pagosRegistradosCampana.some(p =>
+            String(p.referencia || '').trim().toUpperCase() === refLimpia &&
+            String(p.banco || '').trim().toUpperCase() === bancoLimpio &&
+            (!campanaId || String(p.campanaId || '').trim() === campanaId)
+          );
+
+          if (duplicado) {
+            alert(`Ya existe un pago registrado con la referencia "${referencia}" en el banco "${banco}" en este operativo.`);
+            return;
+          }
+        }
+
+        let captureInfo = { path: '', url: '' };
+        if (archivoCapture || captureComprimidoBlob) {
+          captureInfo = await subirCaptureSupabase(campanaId, cedula, referencia, archivoCapture);
+        }
+
+        const vecinoObj = registrosGas.find(r => String(r.cedula).trim() === cedula);
+        const telefonoVecino = vecinoObj?.telefono || '';
+        const lotePago = `LOTE-${Date.now()}`;
+        const usuarioActual = localStorage.getItem('gas_usuario') || 'Vecino';
+
+        const nuevoPago = {
+          id: lotePago,
+          campanaId,
+          cedula,
+          nombre,
+          telefono: telefonoVecino,
+          bombonas: [...bombonasSeleccionadasPago],
+          subtotalBombonas: subtotalBombones,
+          subtotalBombones,
+          propina,
+          totalPagar,
+          total: totalPagar,
+          monto: totalPagar,
+          pm,
+          ef,
+          banco,
+          referencia,
+          capturePath: captureInfo.path,
+          captureUrl: captureInfo.url,
+          terceroNombre,
+          terceroCedula,
+          cotejadoBanco: false,
+          cotejadoPor: '',
+          registradoPor: usuarioActual,
+          fechaRegistro: new Date().toISOString(),
+          fecha: new Date().toISOString()
+        };
+
+        if (sbClient) {
+          const filasPago = bombonasSeleccionadasPago.map(b => {
+            const precioUnit = Number(b.precio) || 0;
+            return {
+              lote_pago: lotePago,
+              campana_id: campanaId,
+              cedula,
+              nombre_apellido: nombre,
+              telefono: telefonoVecino || '',
+              numero_bombona: b.numero || 'S/N',
+              bombona_tamano: b.tamano || 'Peq (10kg)',
+              cantidad: 1,
+              precio: precioUnit,
+              monto: precioUnit,
+              propina,
+              total_pagar: totalPagar,
+              monto_pm: pm,
+              monto_ef: ef,
+              banco_codigo: banco || '',
+              referencia: referencia || '',
+              capture_path: captureInfo.path || '',
+              capture_url: captureInfo.url || '',
+              tercero_nombre: terceroNombre || '',
+              tercero_cedula: terceroCedula || '',
+              cotejado_banco: false,
+              cotejado_por: '',
+              registrado_por: usuarioActual || ''
+            };
+          });
+
+          const { error: errPago } = await sbClient.from('pagos_gas').insert(filasPago);
+          if (errPago) {
+            throw new Error("Supabase rechazó el pago: " + errPago.message);
+          }
+          setEstadoSync("● Sincronizado Supabase", true);
+        }
+
+        pagosRegistradosCampana.unshift(nuevoPago);
+        localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
+
+        renderizarTablaPagos();
+        renderizarResumenPdvsa();
+        limpiarFormularioPago();
+
+        alert(`✓ Pago registrado y sincronizado: Total Bs. ${totalPagar.toFixed(2)}`);
+      } catch (err) {
+        console.error("Error al registrar pago:", err);
+        setEstadoSync("! Error al guardar pago en SB", false);
+        alert("⚠️ " + (err?.message || "Ocurrió un error al validar o guardar el pago."));
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = textoOriginal;
+        }
       }
     }
-
-    const nuevoPago = {
-      id: Date.now(),
-      campanaId,
-      cedula,
-      nombre,
-      bombonas: [...bombonasSeleccionadasPago],
-      subtotalBombones,
-      propina,
-      totalPagar,
-      total: totalPagar,
-      pm,
-      ef,
-      banco,
-      referencia,
-      terceroNombre,
-      terceroCedula,
-      fecha: new Date().toISOString()
-    };
-
-    if (!Array.isArray(pagosRegistradosCampana)) {
-      window.pagosRegistradosCampana = [];
-    }
-    pagosRegistradosCampana.unshift(nuevoPago);
-    localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
-
-    if (typeof renderizarTablaPagos === 'function') {
-      renderizarTablaPagos();
-    }
-    if (typeof limpiarFormularioPago === 'function') {
-      limpiarFormularioPago();
-    }
-
-    alert(`✓ Pago registrado: Total Bs. ${totalPagar.toFixed(2)}`);
-  } catch (err) {
-    console.error("Error al registrar pago:", err);
-    alert("Ocurrió un error al validar o guardar el pago.");
-  } finally {
-    if (btnSubmit) {
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = textoOriginal;
-    }
-  }
-}
 
     function renderizarTablaPagos() {
       const tbody = document.getElementById('tabla-pagos-body');
@@ -1987,7 +2177,7 @@
       tbody.innerHTML = '';
 
       if (!pagosFiltrados.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay pagos registrados en esta campaña aún.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay pagos registrados en este operativo aún.</td></tr>`;
         return;
       }
 
@@ -2057,6 +2247,7 @@
       pagosRegistradosCampana[idx].cotejadoPor = nuevoEstado ? usuario : '';
       localStorage.setItem('pagosRegistradosCampana', JSON.stringify(pagosRegistradosCampana));
       renderizarTablaPagos();
+      verCaptureEnVisor(idPago);
 
       if (sbClient) {
         await sbClient.from('pagos_gas').update({
@@ -2073,7 +2264,7 @@
       const bombonasTxt = (p.bombonas || []).map(b => `N° ${b.numero} (${b.tamano})`).join(', ');
       const txt = [
         "*Gas Vecinal Las Mercedes* (Sector 1, Calle 2, Quebrada de Lele)",
-        `Comprobante de Pago · Campaña: *${p.campanaId}*`,
+        `Comprobante de Pago · Operativo: *${p.campanaId}*`,
         `Vecino: *${p.nombre}* (CI: ${p.cedula})`,
         `Cilindros: ${bombonasTxt}`,
         `Total pagado: *Bs. ${Number(p.totalPagar || 0).toFixed(2)}* (PM: ${Number(p.pm || 0).toFixed(2)} | Ef: ${Number(p.ef || 0).toFixed(2)})`,
@@ -2241,7 +2432,7 @@
       if (badgeEl) badgeEl.textContent = `${pagadas.length} bombona(s) pagada(s)`;
 
       if (!pagadas.length) {
-        listaEl.innerHTML = `<div class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2.5">No se encontraron bombonas pagadas para la cédula <strong>${cedulaBuscada}</strong> en esta campaña.</div>`;
+        listaEl.innerHTML = `<div class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2.5">No se encontraron bombonas pagadas para la cédula <strong>${cedulaBuscada}</strong> en este operativo.</div>`;
         actualizarPanelAveriaPorSeleccion();
         return;
       }
@@ -2312,7 +2503,7 @@
       const seleccionadas = bombonasPagadasVecinoPatio.filter(b => b.recibida || b.tieneAveria);
 
       if (!campanaId || !nombre) {
-        alert("⚠️ Seleccione la campaña y busque la cédula del vecino.");
+        alert("⚠️ Seleccione el operativo y busque la cédula del vecino.");
         return;
       }
       if (!seleccionadas.length) {
@@ -2320,8 +2511,8 @@
         return;
       }
 
-      const usuarioActual = localStorage.getItem('gas_usuario') || 'Jorge';
-      const rolActual = localStorage.getItem('gas_rol') || 'ADMIN';
+      const usuarioActual = localStorage.getItem('gas_usuario') || 'Vecino';
+      const rolActual = localStorage.getItem('gas_rol') || 'VECINO';
       const motivo = document.getElementById('averia-motivo').value;
       const estadoPatio = document.getElementById('averia-estado').value;
       const metodoDevolucion = document.getElementById('averia-metodo-devolucion').value;
@@ -2520,7 +2711,7 @@
       tbody.innerHTML = '';
 
       if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay registros en patio para esta campaña.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No hay registros en patio para este operativo.</td></tr>`;
         return;
       }
 
@@ -2531,7 +2722,7 @@
           ? `<strong class="text-slate-800">Bs. ${Number(a.montoDevuelto || 0).toFixed(2)}</strong>
              <div class="text-[10px] text-slate-500">${a.metodoDevolucion || 'Efectivo'}</div>
              <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold ${esDev ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esDev ? 'PAGO DEVUELTO' : 'PENDIENTE DEVOLUCIÓN'}</span>`
-          : `<span class="inline-block bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px]">RECIBIDA · PLANTA</span>`;
+          : `<span class="inline-block bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded text-[10px]">RECIBIDA · x ENVIAR A PLANTA</span>`;
 
         const accionesHtml = esAv
           ? (esDev
@@ -2594,7 +2785,7 @@
 
       const nota = (document.getElementById('entrega-nota-retiro')?.value || '').trim() || 'Retiro en patio';
       const usuario = localStorage.getItem('gas_usuario') || 'Jorge';
-      const rol = localStorage.getItem('gas_rol') || 'ADMIN';
+      const rol = localStorage.getItem('gas_rol') || 'VECINO';
       const idEntrega = `ENT-${Date.now()}`;
       const nuevo = {
 
@@ -2932,7 +3123,7 @@ function enviarComprobanteEntregaWs(destino = 'vecino') {
       setTxt('res-kpi-averias-monto', `Bs. ${(m.montoDevuelto + m.montoPendienteDev).toFixed(2)}`);
       setTxt('res-kpi-averias-detalle', `Dev: Bs. ${m.montoDevuelto.toFixed(2)} · Pend: Bs. ${m.montoPendienteDev.toFixed(2)}`);
       setTxt('res-kpi-patio', `${m.totalEntregadas} / ${m.totalAptasPatio}`);
-      setTxt('res-kpi-patio-sub', `Pagadas en campaña: ${m.totalBombonasPagadas} cil.`);
+      setTxt('res-kpi-patio-sub', `Pagadas en operativo: ${m.totalBombonasPagadas} cil.`);
 
       const filas = Object.values(m.porTamano);
       document.getElementById('tabla-resumen-tamanos-body').innerHTML = filas.map(f => `
@@ -2963,7 +3154,7 @@ function enviarComprobanteEntregaWs(destino = 'vecino') {
             const pct = m.totalPM > 0 ? ((b.monto / m.totalPM) * 100).toFixed(1) : '0.0';
             return `<tr class="hover:bg-slate-50 border-b"><td class="p-2.5 font-semibold">${b.nombre}</td><td class="p-2.5 text-center">${b.ops}</td><td class="p-2.5 text-right font-mono font-bold text-emerald-700">Bs. ${b.monto.toFixed(2)}</td><td class="p-2.5 text-right">${pct}%</td></tr>`;
           }).join('')
-        : `<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay cobros por Pago Móvil en esta campaña.</td></tr>`;
+        : `<tr><td colspan="4" class="p-3 text-center text-slate-400">No hay cobros por Pago Móvil en este operativo.</td></tr>`;
 
       setTxt('res-cuadre-efectivo', `Bs. ${m.totalEf.toFixed(2)}`);
       setTxt('res-cuadre-bancos', `Bs. ${m.totalPM.toFixed(2)}`);
@@ -2980,7 +3171,7 @@ function enviarComprobanteEntregaWs(destino = 'vecino') {
       return [
         "📊 *RESUMEN OPERATIVO — GAS VECINAL LAS MERCEDES*",
         "_(Sector 1, Calle 2, Quebrada de Lele)_",
-        `Campaña: *${campObj?.nombre || campanaId}*`,
+        `Operativo: *${campObj?.nombre || campanaId}*`,
         `• *Total Recaudado:* Bs. *${m.totalRecaudado.toFixed(2)}* (PM: ${m.totalPM.toFixed(2)} | Ef: ${m.totalEf.toFixed(2)})`,
         `• *A Pagar / Rendir PDVSA:* Bs. *${m.netoPagarPdvsa.toFixed(2)}*`,
         `• *Propinas:* Bs. *${m.totalPropinas.toFixed(2)}*`,
